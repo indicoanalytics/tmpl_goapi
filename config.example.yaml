@@ -1,0 +1,12 @@
+port: 9090
+dBHost: 127.0.01
+dBPort: 5432
+dBUser: postgres
+dBPass: password
+dBName: agata
+dBLogMode: 3
+debug: true
+gcpProjectID: innovation-dev-321010
+storageBucket: artifacts.innovation-dev-321010.appspot.com
+storageBaseFolder: agata
+environment: local
