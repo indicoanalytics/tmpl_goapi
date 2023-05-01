@@ -30,3 +30,13 @@ A little introduction here...
 
 ## Tests
 - To run and perform test cases, run the following command: ```make test```. It will begin the tests execution.
+
+<hr />
+
+## Accepted Methods and Content-Types
+
+| Method |--| Content-Type |
+|:------:|--|:------------:|
+|POST    |--|application/json|
+|GET     |--|
+|OPTIONS |--|
