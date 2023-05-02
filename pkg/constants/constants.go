@@ -8,10 +8,12 @@ import (
 )
 
 const (
-	Port             = "9090"
-	MainLoggerName   = "health"
-	MainServiceName  = MainLoggerName + "_api"
-	MaxResquestLimit = 2
+	Port                      = "9090"
+	MainLoggerName            = "health"
+	MainServiceName           = MainLoggerName + "_api"
+	MaxResquestLimit          = 2
+	AccessTokenExpirationTime = 15
+	Audience                  = "https://iam.services.indicoinnovation.pt"
 )
 
 var (
@@ -21,7 +23,10 @@ var (
 )
 
 var (
-	AllowedContentTypes = []string{fiber.MIMEApplicationJSON}
-	AllowedOrigins      = "https://tbd, https://tbd"
-	AllowedStageOrigins = "https://localhost:3000, http://localhost:3000"
+	AllowedContentTypes   = []string{fiber.MIMEApplicationJSON}
+	AllowedHeaders        = "X-Session-Id, Authorization, Content-Type, Accept, Origin"
+	AllowedMethods        = "GET,POST,OPTIONS"
+	AllowedOrigins        = "https://tbd, https://tbd"
+	AllowedStageOrigins   = "https://localhost:3000, http://localhost:3000"
+	AllowedUnthrottledIPs = []string{"127.0.0.1"}
 )

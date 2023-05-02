@@ -52,7 +52,12 @@ func ApplicationInit() {
 }
 
 func Setup() {
-	err := Inst.Server.Listen(fmt.Sprintf(":%s", Inst.Config.Port))
+	var err error
+	if Inst.Config.Environment != "production" {
+		err = Inst.Server.ListenTLS(fmt.Sprintf(":%s", Inst.Config.Port), "cert.pem", "key.pem")
+	} else {
+		err = Inst.Server.Listen(fmt.Sprintf(":%s", Inst.Config.Port))
+	}
 
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
@@ -60,22 +65,15 @@ func Setup() {
 }
 
 func customErrorHandler(context *fiber.Ctx, err error) error {
-	go logging.Log(
-		&logging.LogDetails{
-			Message:    "captured Unknown error",
-			Reason:     err.Error(),
-			StatusCode: http.StatusInternalServerError,
-			// RequestData: context.,
-		},
-		"emergency",
-		nil,
-	)
-
-	code := fiber.StatusInternalServerError
-
+	var code int = fiber.StatusInternalServerError
+	var message string = "unknown error"
 	var capturedError *fiber.Error
+
 	if errors.As(err, &capturedError) {
 		code = capturedError.Code
+		if code == fiber.StatusNotFound {
+			message = "route not found"
+		}
 	}
 
 	var errorResponse *entity.ErrorResponse
@@ -83,7 +81,7 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 	erro := json.Unmarshal([]byte(err.Error()), &errorResponse)
 	if erro != nil {
 		errorResponse = &entity.ErrorResponse{
-			Message:     "Unknown Error",
+			Message:     message,
 			StatusCode:  code,
 			Description: err.Error(),
 		}
@@ -91,11 +89,10 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 
 	go logging.Log(
 		&logging.LogDetails{
-			Message:    "default message",
-			Reason:     err.Error(),
-			StatusCode: code,
-
-			// RequestData: context.,
+			Message:     message,
+			Reason:      err.Error(),
+			StatusCode:  code,
+			RequestData: string(context.Body()),
 		},
 		"critical",
 		nil,

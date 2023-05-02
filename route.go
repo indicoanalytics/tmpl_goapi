@@ -26,13 +26,13 @@ func route() *fiber.App {
 		allowedOrigins += fmt.Sprintf(", %s", constants.AllowedStageOrigins)
 	}
 
-	app.Inst.Server.Use(recover.New())
 	app.Inst.Server.Use(logger.New())
+	app.Inst.Server.Use(recover.New())
 	app.Inst.Server.Use(favicon.New())
 	app.Inst.Server.Use(cors.New(cors.Config{
-		AllowMethods: "GET,POST,OPTIONS",
+		AllowMethods: constants.AllowedMethods,
 		AllowOrigins: allowedOrigins,
-		AllowHeaders: "X-Session-Id, Authorization, Content-Type, Accept, Origin",
+		AllowHeaders: constants.AllowedHeaders,
 	}))
 	app.Inst.Server.Use(middleware.ValidateContentType())
 	app.Inst.Server.Use(middleware.SecurityHeaders())
@@ -41,11 +41,9 @@ func route() *fiber.App {
 	}))
 
 	apiGroup := app.Inst.Server.Group("/api")
-	// apiGroup.Use(middleware.Authorize())
-
 	apiGroup.Use(limiter.New(limiter.Config{
 		Next: func(c *fiber.Ctx) bool {
-			return c.IP() == "127.0.0.1"
+			return helpers.Contains(constants.AllowedUnthrottledIPs, c.IP())
 		},
 		Max:        constants.MaxResquestLimit,
 		Expiration: 1 * time.Minute,
@@ -62,6 +60,13 @@ func route() *fiber.App {
 	}))
 
 	apiGroup.Get("/health", health.Handle().Check)
+
+	secureRoutes := apiGroup.Group("", middleware.Authorize())
+	v1Group := secureRoutes.Group("/v1")
+
+	v1Group.Get("/healthmyegg", health.Handle().Check)
+
+	// Put auth required routes here
 
 	return app.Inst.Server
 }
