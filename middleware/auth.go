@@ -12,16 +12,26 @@ import (
 
 func Authorize() func(context *fiber.Ctx) error {
 	return func(context *fiber.Ctx) error {
-		authBearer := context.GetReqHeaders()["Authorization"]
+		// TODO: Log intent to Authorize request
 
-		if authBearer == "" {
+		authBearer := context.GetReqHeaders()["Authorization"]
+		authSpec := strings.Split(authBearer, " ")
+
+		if authSpec[0] != "Bearer" {
 			return helpers.CreateResponse(context, &entity.ErrorResponse{
 				Message:    "Unauthorized",
 				StatusCode: http.StatusUnauthorized,
 			}, http.StatusUnauthorized)
 		}
 
-		if _, err := jwt.Verify(strings.Split(authBearer, " ")[1]); err != nil {
+		if authSpec[1] == "" {
+			return helpers.CreateResponse(context, &entity.ErrorResponse{
+				Message:    "Unauthorized",
+				StatusCode: http.StatusUnauthorized,
+			}, http.StatusUnauthorized)
+		}
+
+		if _, err := jwt.Verify(authSpec[1]); err != nil {
 			return helpers.CreateResponse(context, &entity.ErrorResponse{
 				Message:    "Unauthorized",
 				StatusCode: http.StatusUnauthorized,
