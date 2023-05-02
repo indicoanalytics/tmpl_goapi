@@ -8,6 +8,7 @@ import (
 
 	// "os"
 
+	"api.default.indicoinnovation.pt/clients/iam"
 	"api.default.indicoinnovation.pt/config"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
@@ -30,6 +31,8 @@ var Inst *Application
 
 func ApplicationInit() {
 	configs := config.New()
+
+	iam.New()
 
 	databaseConnection, err := postgres.Connect(configs.DBString, logger.LogLevel(configs.DBLogMode), configs.Debug)
 	if err != nil {
