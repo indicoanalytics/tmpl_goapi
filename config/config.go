@@ -55,6 +55,8 @@ func setupLocal() *Config {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
 
+	config.Environment = os.Getenv("ENVIRONMENT")
+
 	return config
 }
 
@@ -105,6 +107,7 @@ func setupSecretManager() *Config {
 		Port:         constants.Port,
 		Debug:        constants.Debug,
 		GcpProjectID: constants.GcpProjectID,
+		Environment:  os.Getenv("ENVIRONMENT"),
 	}
 
 	err = helpers.Unmarshal(secretToBytes(secretList), config)
