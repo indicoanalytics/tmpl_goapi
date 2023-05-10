@@ -12,15 +12,19 @@ setup: go.mod
 	@test -f cert.pem || go run /usr/local/go/src/crypto/tls/generate_cert.go --host localhost
 	@test -f .env || cp .env.example .env
 	@test -f config.yaml || cp config.example.yaml config.yaml
-	@make generate_keys
+	@make generate_key
 	@echo "## Configuration files are now ready to use ##"
 
 	@sleep 2
 
 	@echo "`tput bold`#### Installing dependencies to your project ####`tput sgr0`"
 	go mod tidy
+
 	go get -u golang.org/x/lint/golint
 	go install golang.org/x/lint/golint
+	go get -u github.com/mgechev/revive
+	go install github.com/mgechev/revive
+
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 	go install mvdan.cc/gofumpt@latest
 	@sleep 2
@@ -55,7 +59,7 @@ lint:
   ifndef file
 	$(error file is not defined)
   else
-	golangci-lint run $(file) --enable-all --disable tagliatelle,wsl,godox,lll,gochecknoglobals,exhaustruct,exhaustivestruct
+	golangci-lint run $(file) --enable-all --disable tagliatelle,wsl,godox,lll,gochecknoglobals,exhaustruct,exhaustivestruct,wrapcheck
   endif
 
 TEST_DATABASE=test_db
@@ -65,4 +69,11 @@ test:
 	go test -tags=unit -short -timeout 30s -v ./...
 
 format:
-	gofumpt -w $(path)
+  ifndef file
+	$(error file is not defined)
+  else
+	gofumpt -w $(file)
+  endif
+
+help:
+	@echo "List of Makefile commands"

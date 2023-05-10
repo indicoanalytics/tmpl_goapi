@@ -1,24 +1,12 @@
 package logging
 
 import (
-	"api.default.indicoinnovation.pt/pkg/constants"
+	"api.default.indicoinnovation.pt/config/constants"
+	"api.default.indicoinnovation.pt/entity"
 	gcpLogging "github.com/INDICO-INNOVATION/gcp_logging_easycall"
 )
 
-type LogDetails struct {
-	User         string      `json:"token"`
-	Message      string      `json:"message"`
-	Reason       string      `json:"reason"`
-	RemoteIP     string      `json:"ipaddress"`
-	Method       string      `json:"method"`
-	URLpath      string      `json:"route"`
-	StatusCode   int         `json:"status_code"`
-	RequestData  interface{} `json:"request_data"`
-	ResponseData interface{} `json:"response_data"`
-	SessionID    string      `json:"sessid"`
-}
-
-func Log(message *LogDetails, severity string, resourceLabels *map[string]string) {
+func Log(message *entity.LogDetails, severity string, resourceLabels *map[string]string) {
 	logMessage := &gcpLogging.Logger{
 		User:         message.User,
 		Message:      message.Message,

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/handler/health"
 	"api.default.indicoinnovation.pt/middleware"
 	"api.default.indicoinnovation.pt/pkg/app"
-	"api.default.indicoinnovation.pt/pkg/constants"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
