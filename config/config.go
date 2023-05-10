@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"api.default.indicoinnovation.pt/pkg/constants"
+	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"

@@ -6,15 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	// "os"
-
+	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/clients/iam"
 	"api.default.indicoinnovation.pt/config"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
-	"api.default.indicoinnovation.pt/pkg/logging"
 	"api.default.indicoinnovation.pt/pkg/postgres"
-
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -69,8 +66,8 @@ func Setup() {
 
 func customErrorHandler(context *fiber.Ctx, err error) error {
 	var code int = fiber.StatusInternalServerError
-	var message string = "unknown error"
 	var capturedError *fiber.Error
+	message := "unknown error"
 
 	if errors.As(err, &capturedError) {
 		code = capturedError.Code
@@ -91,7 +88,7 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 	}
 
 	go logging.Log(
-		&logging.LogDetails{
+		&entity.LogDetails{
 			Message:     message,
 			Reason:      err.Error(),
 			StatusCode:  code,

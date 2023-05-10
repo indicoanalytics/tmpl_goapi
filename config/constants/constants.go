@@ -13,6 +13,7 @@ const (
 	MainServiceName           = MainLoggerName + "_api"
 	MaxResquestLimit          = 2
 	AccessTokenExpirationTime = 15
+	SignedURLExp              = 60
 	Audience                  = "https://iam.services.indicoinnovation.pt"
 )
 

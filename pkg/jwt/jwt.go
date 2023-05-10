@@ -5,25 +5,25 @@ import (
 	"fmt"
 	"time"
 
-	"api.default.indicoinnovation.pt/pkg/constants"
+	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/pkg/crypt"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
 
-type JwtHeaders struct {
+type Headers struct {
 	Key   string
 	Value string
 }
 
 var ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
 
-var Headers = map[string]string{
+var DefaultHeaders = map[string]string{
 	"alg": "RS512",
 	"typ": "JWT",
 }
 
-func SetupClaims(userEmail string, customArgs ...JwtHeaders) jwt.MapClaims {
+func SetupClaims(userEmail string, customArgs ...Headers) jwt.MapClaims {
 	accessTokenClaims := jwt.MapClaims{
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Duration(constants.AccessTokenExpirationTime) * time.Minute).Unix(),

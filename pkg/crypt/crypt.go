@@ -8,14 +8,15 @@ import (
 	"encoding/pem"
 	"os"
 
-	"api.default.indicoinnovation.pt/pkg/logging"
+	"api.default.indicoinnovation.pt/adapters/logging"
+	"api.default.indicoinnovation.pt/entity"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func ParsePrivateKey() *rsa.PrivateKey {
 	priv, err := os.ReadFile("private.pem")
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not get private key file",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -27,7 +28,7 @@ func ParsePrivateKey() *rsa.PrivateKey {
 
 	privateKey, err := x509.ParsePKCS8PrivateKey(privatePem.Bytes)
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not parse private key",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -35,14 +36,23 @@ func ParsePrivateKey() *rsa.PrivateKey {
 		panic("could not parse private key")
 	}
 
-	return privateKey.(*rsa.PrivateKey) //nolint: forcetypeassert
+	private, ok := privateKey.(*rsa.PrivateKey)
+	if !ok {
+		go logging.Log(&entity.LogDetails{
+			Message: "error to assert type rsa.PrivateKey for private.pem",
+		}, "critical", nil)
+
+		panic("error to assert type rsa.PrivateKey for private.pem")
+	}
+
+	return private
 }
 
 func Encrypt(data string) ([]byte, error) {
 	private := ParsePrivateKey()
 	decoded, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not decode string to encrypt",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -52,7 +62,7 @@ func Encrypt(data string) ([]byte, error) {
 
 	plainText, err := rsa.EncryptPKCS1v15(rand.Reader, &private.PublicKey, decoded)
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not encrypt",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -67,7 +77,7 @@ func Decrypt(value string) (string, error) {
 	private := ParsePrivateKey()
 	decoded, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not decode string to decrypt",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -77,7 +87,7 @@ func Decrypt(value string) (string, error) {
 
 	plainText, err := rsa.DecryptPKCS1v15(rand.Reader, private, decoded)
 	if err != nil {
-		go logging.Log(&logging.LogDetails{
+		go logging.Log(&entity.LogDetails{
 			Message: "could not decrypt",
 			Reason:  err.Error(),
 		}, "critical", nil)

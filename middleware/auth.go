@@ -6,12 +6,12 @@ import (
 
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
-	"api.default.indicoinnovation.pt/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Authorize() func(context *fiber.Ctx) error {
 	return func(context *fiber.Ctx) error {
+		// TODO: Implement mechanism to authorize requests from given IP to measure endpoint status and metrics
 		// TODO: Log intent to Authorize request
 
 		authBearer := context.GetReqHeaders()["Authorization"]
@@ -31,12 +31,8 @@ func Authorize() func(context *fiber.Ctx) error {
 			}, http.StatusUnauthorized)
 		}
 
-		if _, err := jwt.Verify(authSpec[1]); err != nil {
-			return helpers.CreateResponse(context, &entity.ErrorResponse{
-				Message:    "Unauthorized",
-				StatusCode: http.StatusUnauthorized,
-			}, http.StatusUnauthorized)
-		}
+		// client, ctx := iam.New()
+		// client.ValidateJWT(ctx, )
 
 		return context.Next()
 	}

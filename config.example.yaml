@@ -1,4 +1,3 @@
-port: 9090
 dbString: postgres://user:password@host:port/dbname
 dbLogMode: 3
 debug: true
