@@ -1,0 +1,61 @@
+steps:
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - '-c'
+      - |
+        gsutil cp gs://${_STORAGE_BUCKET}/api/config.yaml /workspace/api \
+        && gsutil cp gs://${_STORAGE_BUCKET}/api/private.pem /workspace/api \
+        && gsutil cp gs://${_STORAGE_BUCKET}/api/public.pem /workspace/api \
+        && gsutil cp gs://${_STORAGE_BUCKET}/api/innovation.json /workspace/api \
+    entrypoint: sh
+
+  # TODO: Connect to Tunnel instead execute cloudsql proxy
+
+  # - name: "python:3.10-bullseye"
+  #   dir: "api"
+  #   args:
+  #     - '-c'
+  #     - |
+  #       wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy && chmod +x cloud_sql_proxy \
+  #       && ./cloud_sql_proxy -instances=${_INSTANCE_CLOUDSQL}=tcp:5432 & sleep 2 \
+  #       && pip install pymigratedb \
+  #       && migrate execute --dbstring ${_DATABASE_URL} --driver pgsql
+    # entrypoint: sh
+
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: "api"
+    args: ['build', '--build-arg', 'ENVIRONMENT=${_ENVIRONMENT}', '--build-arg', 'SEC_PREFIX=${_SEC_PREFIX}', '--build-arg', 'AUTH_SERVER=${_AUTH_SERVER}', '-t', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: "api"
+    args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    dir: "api"
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - '${_SERVICE_NAME}'
+    - '--image'
+    - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+    - '--region'
+    - 'us-east1'
+    - '--cpu'
+    - '${_CPUS}'
+    - '--memory'
+    - '${_MEMORY}'
+    - '--max-instances'
+    - '${_MAX_INSTANCES}'
+    - '--port'
+    - '9090'
+    - '--allow-unauthenticated'
+    - '--vpc-connector'
+    - '${_VPC_CONNECTOR}'
+    - '--vpc-egress'
+    - '${_EGRESS}'
+    - '--platform'
+    - 'managed'
+
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
