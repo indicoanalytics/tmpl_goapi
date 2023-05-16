@@ -15,12 +15,16 @@ const (
 	AccessTokenExpirationTime = 15
 	SignedURLExp              = 60
 	Audience                  = "https://iam.services.indicoinnovation.pt"
+	DefaultLimit              = 10
+	DefaultOffset             = 0
 )
 
 var (
 	Debug, _     = strconv.ParseBool(os.Getenv("DEBUG"))
 	GcpProjectID = os.Getenv("PROJECT")
 	SecretPrefix = os.Getenv("SEC_PREFIX")
+	UseTls       = os.Getenv("USE_TLS")
+	Environment  = os.Getenv("ENVIRONMENT")
 )
 
 var (

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -30,7 +29,7 @@ type Config struct {
 }
 
 func New() *Config {
-	if os.Getenv("ENVIRONMENT") == "local" {
+	if constants.Environment == "local" {
 		return setupLocal()
 	}
 
@@ -54,8 +53,6 @@ func setupLocal() *Config {
 	if err != nil {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
-
-	config.Environment = os.Getenv("ENVIRONMENT")
 
 	return config
 }
@@ -103,12 +100,7 @@ func setupSecretManager() *Config {
 		secretList[secretName] = accessSecretVersion(fmt.Sprintf("%s/versions/latest", secret.Name))
 	}
 
-	config = &Config{
-		Port:         constants.Port,
-		Debug:        constants.Debug,
-		GcpProjectID: constants.GcpProjectID,
-		Environment:  os.Getenv("ENVIRONMENT"),
-	}
+	config = &Config{}
 
 	err = helpers.Unmarshal(secretToBytes(secretList), config)
 	if err != nil {

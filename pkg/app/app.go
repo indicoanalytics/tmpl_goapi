@@ -8,10 +8,11 @@ import (
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/clients/iam"
+	"api.default.indicoinnovation.pt/clients/postgres"
 	"api.default.indicoinnovation.pt/config"
+	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
-	"api.default.indicoinnovation.pt/pkg/postgres"
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -26,20 +27,15 @@ type Application struct {
 
 var Inst *Application
 
+var errConnectDB = errors.New("error to connect to database")
+
 func ApplicationInit() {
 	configs := config.New()
 
 	iam.New()
 
-	databaseConnection, err := postgres.Connect(configs.DBString, logger.LogLevel(configs.DBLogMode), configs.Debug)
-	if err != nil {
-		log.Panicln(fmt.Sprintf("Failed to initialize %s DB Connection", configs.DBString), err)
-	}
-
-	log.Printf("Database is now connected")
-
 	Inst = &Application{
-		DBInstance: databaseConnection,
+		DBInstance: ConnectDatabase(configs),
 		Config:     configs,
 		Server: fiber.New(fiber.Config{
 			ServerHeader: "Death Star",
@@ -53,10 +49,10 @@ func ApplicationInit() {
 
 func Setup() {
 	var err error
-	if Inst.Config.Environment != "production" {
-		err = Inst.Server.ListenTLS(fmt.Sprintf(":%s", Inst.Config.Port), "cert.pem", "key.pem")
+	if constants.Environment != "production" {
+		err = Inst.Server.ListenTLS(fmt.Sprintf(":%s", constants.Port), "cert.pem", "key.pem")
 	} else {
-		err = Inst.Server.Listen(fmt.Sprintf(":%s", Inst.Config.Port))
+		err = Inst.Server.Listen(fmt.Sprintf(":%s", constants.Port))
 	}
 
 	if errors.Is(err, http.ErrServerClosed) {
@@ -99,4 +95,15 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 	)
 
 	return helpers.CreateResponse(context, errorResponse, code) //nolint: wrapcheck
+}
+
+func ConnectDatabase(config *config.Config) *gorm.DB {
+	databaseConnection, err := postgres.Connect(config.DBString, logger.LogLevel(config.DBLogMode), config.Debug)
+	if err != nil {
+		log.Panicln(errConnectDB, err)
+	}
+
+	log.Printf("Database is now connected")
+
+	return databaseConnection
 }

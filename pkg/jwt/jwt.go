@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"api.default.indicoinnovation.pt/config/constants"
@@ -34,7 +33,9 @@ func SetupClaims(userEmail string, customArgs ...Headers) jwt.MapClaims {
 	}
 
 	if len(customArgs) > 0 {
-		fmt.Print("TODO")
+		for _, arg := range customArgs {
+			accessTokenClaims[arg.Key] = arg.Value
+		}
 	}
 
 	return accessTokenClaims
