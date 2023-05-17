@@ -1,37 +1,39 @@
 steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-    args:
-      - '-c'
-      - |
-        gsutil cp gs://${_STORAGE_BUCKET}/api/config.yaml /workspace/api \
-        && gsutil cp gs://${_STORAGE_BUCKET}/api/private.pem /workspace/api \
-        && gsutil cp gs://${_STORAGE_BUCKET}/api/public.pem /workspace/api \
-        && gsutil cp gs://${_STORAGE_BUCKET}/api/innovation.json /workspace/api \
-    entrypoint: sh
+    env:
+      - 'STORAGE_BUCKET=${_STORAGE_BUCKET}'
+    script: |
+      #!/usr/bin/env bash
 
-  # TODO: Connect to Tunnel instead execute cloudsql proxy
+      gsutil cp gs://$STORAGE_BUCKET/api/config.yaml /workspace/api
+      gsutil cp gs://$STORAGE_BUCKET/api/private.pem /workspace/api
+      gsutil cp gs://$STORAGE_BUCKET/api/public.pem /workspace/api
+      gsutil cp gs://$STORAGE_BUCKET/api/innovation.json /workspace/api
 
-  # - name: "python:3.10-bullseye"
-  #   dir: "api"
-  #   args:
-  #     - '-c'
-  #     - |
-  #       wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy && chmod +x cloud_sql_proxy \
-  #       && ./cloud_sql_proxy -instances=${_INSTANCE_CLOUDSQL}=tcp:5432 & sleep 2 \
-  #       && pip install pymigratedb \
-  #       && migrate execute --dbstring ${_DATABASE_URL} --driver pgsql
-    # entrypoint: sh
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    env:
+      - 'DATABASE_URL=${_DATABASE_URL}'
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'CLOUDSQL_IP=${_CLOUDSQL_IP}'
+      - 'TUNNEL_VM=${_TUNNEL_VM}'
+    script: |
+      #!/usr/bin/env bash
+
+      # TODO: Connect to Tunnel instead execute cloudsql proxy
+      gcloud compute ssh $TUNNEL_VM --project $PROJECT_ID -- -NL 5432:$CLOUDSQL_IP:5432
+
+      sleep 2
+
+      pip install pymigratedb
+      migrate execute --dbstring $DATABASE_URL --driver pgsql
 
   - name: 'gcr.io/cloud-builders/docker'
-    dir: "api"
     args: ['build', '--build-arg', 'ENVIRONMENT=${_ENVIRONMENT}', '--build-arg', 'SEC_PREFIX=${_SEC_PREFIX}', '--build-arg', 'AUTH_SERVER=${_AUTH_SERVER}', '-t', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    dir: "api"
     args: ['push', 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-    dir: "api"
     entrypoint: gcloud
     args:
     - 'run'
