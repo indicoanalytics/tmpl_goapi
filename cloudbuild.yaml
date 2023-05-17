@@ -19,7 +19,6 @@ steps:
     script: |
       #!/usr/bin/env bash
 
-      # TODO: Connect to Tunnel instead execute cloudsql proxy
       gcloud compute ssh $TUNNEL_VM --project $PROJECT_ID -- -NL 5432:$CLOUDSQL_IP:5432
 
       sleep 2
