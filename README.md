@@ -41,45 +41,68 @@ A little introduction here...
 |GET     |
 |OPTIONS |
 
+<hr />
+
+## Relevant Environment Variables
+
+| Variable | Possible Values | Description |
+|:--------:|:---------------:|:-----------:|
+|ENVIRONMENT|local, staging,  production|Environment where deployment is working|
+|USE_SECRETMANAGER|true,false,""|Decide to use or not Google Cloud Secret Manager|
+|INNOVATION_CREDENTIALS|path to credentials.json|Indico IAM Credentials file to integrate with authorization and authentication functionalities|
+|SEC_PREFIX|desirable prefix|Prefix to use inside Secret Manager|
+|AUTH_SERVER|iam auth server uri|IAM Auth Server URI|
+|INSECURE|true,false,""|Use IAM Server in insecure mode|
+|USE_TLS|true,false,""|Use HTTPS connections|
+|PREFORK|true,false,""|Use prefork threads|
+
+<hr />
+
 ## API Structure
 
 ```bash
 .
-├── adapters - # Adapter surface, to communicate with any client in a single interface, with standard input and output
+├── adapters
+│   ├── database
+│   │   └── database.go
 │   ├── logging
 │   │   └── logging.go
-│   └── storage
-│       └── storage.go
-├── app - # Main application business logic directory
+│   ├── storage
+│   │   └── storage.go
+│   └── totp
+│       └── totp.go
+├── app
 │   ├── errors
 │   │   └── errors.go
 │   ├── repository
 │   │   └── .gitkeep
 │   └── usecases
 │       └── .gitkeep
-├── clients - # Clients to implement and communicate with services and integrations provided to the API
+├── clients
 │   ├── google
 │   │   ├── logging
 │   │   │   └── logging.go
 │   │   └── storage
 │   │       └── storage.go
-│   └── iam
-│       └── client.go
-├── config - # Config files to make API running properly
+│   ├── iam
+│   │   └── client.go
+│   └── postgres
+│       └── postgres.go
+├── config
 │   ├── constants
 │   │   └── constants.go
 │   └── config.go
-├── entity - # Entities and standard application types
+├── entity
 │   ├── http_response.go
 │   └── log.go
-├── handler - # Handlers, or API entrypoints
+├── handler
 │   └── health
 │       └── health.go
-├── middleware - # Middlewares to control what is being received and sent
+├── middleware
 │   ├── auth.go
 │   ├── content.go
 │   └── security.go
-├── pkg - # Helper files
+├── pkg
 │   ├── app
 │   │   └── app.go
 │   ├── crypt
@@ -88,18 +111,17 @@ A little introduction here...
 │   │   ├── http.go
 │   │   ├── json.go
 │   │   └── utils.go
-│   ├── jwt
-│   │   └── jwt.go
-│   └── postgres
-│       └── postgres.go
+│   └── jwt
+│       └── jwt.go
+├── .dockerignore
 ├── .env.example
 ├── .gitignore
 ├── .innovation_env
 ├── config.example.yaml
+├── Dockerfile
 ├── go.mod
 ├── go.sum
-├── main.go - # Golang Entrypoint and framework setup
-├── Makefile
+├── main.go
 ├── README.md
-└── route.go - # API routing
+└── route.go
 ```

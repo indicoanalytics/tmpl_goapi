@@ -28,3 +28,4 @@ config*.yaml
 
 *.pem
 credentials*.json
+innovation.json
