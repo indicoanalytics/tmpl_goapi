@@ -3,6 +3,7 @@ package constants
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,14 +18,17 @@ const (
 	Audience                  = "https://iam.services.indicoinnovation.pt"
 	DefaultLimit              = 10
 	DefaultOffset             = 0
+	DefaultOTPGenerator       = "iam"
 )
 
 var (
-	Debug, _     = strconv.ParseBool(os.Getenv("DEBUG"))
-	GcpProjectID = os.Getenv("PROJECT")
-	SecretPrefix = os.Getenv("SEC_PREFIX")
-	UseTls       = os.Getenv("USE_TLS")
-	Environment  = os.Getenv("ENVIRONMENT")
+	Debug, _         = strconv.ParseBool(os.Getenv("DEBUG"))
+	GcpProjectID     = os.Getenv("PROJECT")
+	SecretPrefix     = os.Getenv("SEC_PREFIX")
+	UseTLS           = strings.ToLower(os.Getenv("USE_TLS")) == "true"
+	Environment      = os.Getenv("ENVIRONMENT")
+	Prefork          = strings.ToLower(os.Getenv("PREFORK")) != "false"
+	UseSecretManager = strings.ToLower(os.Getenv("USE_SECRETMANAGER")) == "true"
 )
 
 var (

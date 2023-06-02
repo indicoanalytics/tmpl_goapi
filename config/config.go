@@ -29,11 +29,11 @@ type Config struct {
 }
 
 func New() *Config {
-	if constants.Environment == "local" {
-		return setupLocal()
+	if constants.UseSecretManager {
+		return setupSecretManager()
 	}
 
-	return setupSecretManager()
+	return setupLocal()
 }
 
 func setupLocal() *Config {

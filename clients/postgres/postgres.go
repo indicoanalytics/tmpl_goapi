@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"database/sql"
 	"time"
 
 	postgresDriver "gorm.io/driver/postgres"
@@ -18,14 +19,14 @@ type postgres struct {
 }
 type Options func(*postgres)
 
-func Connect(dbString string, dbLogMode logger.LogLevel, debug bool, sqloptions ...Options) (*gorm.DB, error) {
+func Connect(dbString string, dbLogMode int, debug bool, sqloptions ...Options) (*sql.DB, error) {
 	const maxIdleConnection = 5
 	const maxOpenConnection = 30
 	const connectionMaxLifetime = 60
 
 	databaseConnection := &postgres{
 		DBString:              dbString,
-		DBLogMode:             dbLogMode,
+		DBLogMode:             logger.LogLevel(dbLogMode),
 		maxIdleConnection:     maxIdleConnection,
 		maxOpenConnection:     maxOpenConnection,
 		connectionMaxLifetime: connectionMaxLifetime,
@@ -63,7 +64,7 @@ func SetMaxLifetime(lifetime int) Options {
 	}
 }
 
-func connect(data *postgres) (*gorm.DB, error) {
+func connect(data *postgres) (*sql.DB, error) {
 	var gormConfig gorm.Config
 
 	if data.Debug {
@@ -85,5 +86,5 @@ func connect(data *postgres) (*gorm.DB, error) {
 	pgDB.SetMaxOpenConns(data.maxOpenConnection)
 	pgDB.SetMaxIdleConns(data.maxIdleConnection)
 
-	return databaseConnection, nil
+	return pgDB, nil
 }

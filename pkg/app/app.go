@@ -8,7 +8,6 @@ import (
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/clients/iam"
-	"api.default.indicoinnovation.pt/clients/postgres"
 	"api.default.indicoinnovation.pt/config"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
@@ -16,7 +15,6 @@ import (
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type Application struct {
@@ -27,29 +25,26 @@ type Application struct {
 
 var Inst *Application
 
-var errConnectDB = errors.New("error to connect to database")
-
 func ApplicationInit() {
 	configs := config.New()
 
 	iam.New()
 
 	Inst = &Application{
-		DBInstance: ConnectDatabase(configs),
-		Config:     configs,
+		Config: configs,
 		Server: fiber.New(fiber.Config{
 			ServerHeader: "Death Star",
 			ErrorHandler: customErrorHandler,
 			JSONEncoder:  json.Marshal,
 			JSONDecoder:  json.Unmarshal,
-			Prefork:      true,
+			Prefork:      constants.Prefork,
 		}),
 	}
 }
 
 func Setup() {
 	var err error
-	if constants.Environment != "production" {
+	if constants.UseTLS {
 		err = Inst.Server.ListenTLS(fmt.Sprintf(":%s", constants.Port), "cert.pem", "key.pem")
 	} else {
 		err = Inst.Server.Listen(fmt.Sprintf(":%s", constants.Port))
@@ -95,15 +90,4 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 	)
 
 	return helpers.CreateResponse(context, errorResponse, code) //nolint: wrapcheck
-}
-
-func ConnectDatabase(config *config.Config) *gorm.DB {
-	databaseConnection, err := postgres.Connect(config.DBString, logger.LogLevel(config.DBLogMode), config.Debug)
-	if err != nil {
-		log.Panicln(errConnectDB, err)
-	}
-
-	log.Printf("Database is now connected")
-
-	return databaseConnection
 }
