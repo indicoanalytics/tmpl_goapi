@@ -11,7 +11,8 @@ import (
 
 var errConnectDB = errors.New("error to connect to database")
 
-func Query(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
+// Using generics.
+func Query[T interface{}](query string, outputType T, args ...interface{}) (T, error) { //nolint:ireturn
 	conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
 	err := conn.QueryRow(query, args...).Scan(&outputType)
 	conn.Close()

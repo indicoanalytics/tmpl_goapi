@@ -21,9 +21,7 @@ func Handle() *Handler {
 
 func (handler *Handler) Check(context *fiber.Ctx) error {
 	// timeNow := time.Now().UTC()
-	_, err := handler.uc.Check()
-
-	if err != nil {
+	if _, err := handler.uc.Check(); err != nil {
 		return helpers.CreateResponse(context, &entity.SuccessfulResponse{
 			Message:    err.Error(),
 			StatusCode: http.StatusInternalServerError,

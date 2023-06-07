@@ -59,7 +59,7 @@ lint:
   ifndef file
 	$(error file is not defined)
   else
-	golangci-lint run $(file) --enable-all --disable tagliatelle,wsl,godox,lll,gochecknoglobals,exhaustruct,exhaustivestruct,wrapcheck
+	golangci-lint run $(file) --go=1.20 --enable-all --disable tagliatelle,wsl,godox,lll,gochecknoglobals,exhaustruct,exhaustivestruct,wrapcheck
   endif
 
 TEST_DATABASE=test_db
