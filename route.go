@@ -61,10 +61,8 @@ func route() *fiber.App {
 
 	apiGroup.Get("/health", health.Handle().Check)
 
-	secureRoutes := apiGroup.Group("", middleware.Authorize())
-	v1Group := secureRoutes.Group("/v1")
-
-	v1Group.Get("/healthmyegg", health.Handle().Check)
+	// secureRoutes := apiGroup.Group("", middleware.Authorize())
+	// v1Group := secureRoutes.Group("/v1")
 
 	// Put auth required routes here
 
