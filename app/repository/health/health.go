@@ -17,5 +17,5 @@ func (repo *Repository) GetHealthCheck() (*entity.Health, error) {
 		FROM health
 	`, new(entity.Health))
 
-	return health.(*entity.Health), err
+	return health, err
 }
