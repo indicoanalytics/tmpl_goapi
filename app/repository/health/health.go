@@ -15,7 +15,8 @@ func (repo *Repository) GetHealthCheck() (*entity.Health, error) {
 	health, err := database.Query(`
 		SELECT *
 		FROM health
-	`, new(entity.Health))
+		WHERE sync <> $1
+	`, new(entity.Health), "2023-06-09 16:43:56")
 
 	return health, err
 }

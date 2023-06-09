@@ -19,7 +19,7 @@ type postgres struct {
 }
 type Options func(*postgres)
 
-func Connect(dbString string, dbLogMode int, debug bool, sqloptions ...Options) (*sql.DB, error) {
+func Connect(dbString string, dbLogMode int, debug bool, sqloptions ...Options) (*gorm.DB, *sql.DB, error) {
 	const maxIdleConnection = 5
 	const maxOpenConnection = 30
 	const connectionMaxLifetime = 60
@@ -64,7 +64,7 @@ func SetMaxLifetime(lifetime int) Options {
 	}
 }
 
-func connect(data *postgres) (*sql.DB, error) {
+func connect(data *postgres) (*gorm.DB, *sql.DB, error) {
 	var gormConfig gorm.Config
 
 	if data.Debug {
@@ -78,7 +78,7 @@ func connect(data *postgres) (*sql.DB, error) {
 
 	databaseConnection, err := gorm.Open(postgresDriver.Open(data.DBString), &gormConfig)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	pgDB, _ := databaseConnection.DB()
@@ -86,5 +86,5 @@ func connect(data *postgres) (*sql.DB, error) {
 	pgDB.SetMaxOpenConns(data.maxOpenConnection)
 	pgDB.SetMaxIdleConns(data.maxIdleConnection)
 
-	return pgDB, nil
+	return databaseConnection, pgDB, nil
 }
