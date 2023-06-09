@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 type Health struct {
-	Status bool `json:"status"`
+	Sync *time.Time `json:"sync"`
 }

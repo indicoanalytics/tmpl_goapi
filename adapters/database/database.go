@@ -7,23 +7,29 @@ import (
 
 	"api.default.indicoinnovation.pt/clients/postgres"
 	"api.default.indicoinnovation.pt/pkg/app"
+	"gorm.io/gorm"
 )
 
 var errConnectDB = errors.New("error to connect to database")
 
 // Using generics.
 func Query[T interface{}](query string, outputType T, args ...interface{}) (T, error) { //nolint:ireturn
-	conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
-	err := conn.QueryRow(query, args...).Scan(&outputType)
-	conn.Close()
+	gormConn, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	defer conn.Close()
+
+	err := gormConn.Raw(query, args...).Scan(&outputType).Error
+	if err != nil {
+		return outputType, err
+	}
 
 	return outputType, err
 }
 
 func Exec(query string, args ...interface{}) error {
-	conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	_, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	defer conn.Close()
+
 	err := conn.QueryRow(query, args...).Err()
-	conn.Close()
 
 	return err
 }
@@ -31,20 +37,21 @@ func Exec(query string, args ...interface{}) error {
 func QueryCount(query string, args ...interface{}) (int, error) {
 	var count int
 
-	conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	_, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	defer conn.Close()
+
 	err := conn.QueryRow(query, args...).Scan(&count)
-	conn.Close()
 
 	return count, err
 }
 
-func Connect(dbString string, logLevel int, debug bool) *sql.DB {
-	databaseConnection, err := postgres.Connect(dbString, logLevel, debug)
+func Connect(dbString string, logLevel int, debug bool) (*gorm.DB, *sql.DB) {
+	gormDB, databaseConnection, err := postgres.Connect(dbString, logLevel, debug)
 	if err != nil {
 		log.Panicln(errConnectDB, err)
 	}
 
 	log.Printf("Database is now connected")
 
-	return databaseConnection
+	return gormDB, databaseConnection
 }
