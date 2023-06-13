@@ -48,7 +48,5 @@ func Connect(dbString string, logLevel int, debug bool) (*gorm.DB, *sql.DB) {
 		log.Panicln(errConnectDB, err)
 	}
 
-	log.Printf("Database is now connected")
-
 	return gormDB, databaseConnection
 }
