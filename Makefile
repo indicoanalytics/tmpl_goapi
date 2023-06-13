@@ -22,8 +22,8 @@ setup: go.mod
 
 	go get -u golang.org/x/lint/golint
 	go install golang.org/x/lint/golint
-	go get -u github.com/mgechev/revive
-	go install github.com/mgechev/revive
+	go get -u github.com/mgechev/revive@latest
+	go install github.com/mgechev/revive@latest
 
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
 	go install mvdan.cc/gofumpt@latest
