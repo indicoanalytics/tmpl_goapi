@@ -19,10 +19,6 @@ steps:
     script: |
       #!/usr/bin/env bash
 
-      gcloud compute ssh $TUNNEL_VM --project $PROJECT_ID -- -NL 5432:$CLOUDSQL_IP:5432
-
-      sleep 2
-
       pip install pymigratedb
       migrate execute --dbstring $DATABASE_URL --driver pgsql
 
