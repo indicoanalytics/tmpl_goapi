@@ -14,13 +14,11 @@ import (
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 type Application struct {
-	DBInstance *gorm.DB
-	Config     *config.Config
-	Server     *fiber.App
+	Config *config.Config
+	Server *fiber.App
 }
 
 var Inst *Application
