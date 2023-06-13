@@ -22,7 +22,7 @@ import (
 
 func route() *fiber.App {
 	allowedOrigins := constants.AllowedOrigins
-	if app.Inst.Config.Environment != "production" {
+	if constants.Environment != "production" {
 		allowedOrigins += fmt.Sprintf(", %s", constants.AllowedStageOrigins)
 	}
 
