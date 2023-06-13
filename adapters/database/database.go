@@ -18,9 +18,6 @@ func Query[T interface{}](query string, outputType T, args ...interface{}) (T, e
 	defer conn.Close()
 
 	err := gormConn.Raw(query, args...).Scan(&outputType).Error
-	if err != nil {
-		return outputType, err
-	}
 
 	return outputType, err
 }

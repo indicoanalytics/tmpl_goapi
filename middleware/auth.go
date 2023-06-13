@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"api.default.indicoinnovation.pt/adapters/jwt"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
@@ -31,8 +32,12 @@ func Authorize() func(context *fiber.Ctx) error {
 			}, http.StatusUnauthorized)
 		}
 
-		// client, ctx := iam.New()
-		// client.ValidateJWT(ctx, )
+		if !jwt.Validate(authSpec[1]) {
+			return helpers.CreateResponse(context, &entity.ErrorResponse{
+				Message:    "Unauthorized",
+				StatusCode: http.StatusUnauthorized,
+			}, http.StatusUnauthorized)
+		}
 
 		return context.Next()
 	}
