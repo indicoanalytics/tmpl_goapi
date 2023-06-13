@@ -6,12 +6,15 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"os"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/entity"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var ErrToParsePrivate = errors.New("error to parse private key")
 
 func ParsePrivateKey() *rsa.PrivateKey {
 	priv, err := os.ReadFile("private.pem")
@@ -102,4 +105,20 @@ func CheckHash(s, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(s))
 
 	return err == nil
+}
+
+func ParsePrivateKeyToString() string {
+	priv, err := os.ReadFile("private.pem")
+	if err != nil {
+		go logging.Log(&entity.LogDetails{
+			Message: "could not get private key file",
+			Reason:  err.Error(),
+		}, "critical", nil)
+
+		panic(ErrToParsePrivate)
+	}
+
+	privateKey := string(priv)
+
+	return privateKey
 }
