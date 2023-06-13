@@ -18,7 +18,6 @@ WORKDIR /go/src/app
 
 COPY --from=builder /go/bin/api.default.indicoinnovation.pt /go/bin/
 COPY --from=builder /go/src/app/private.pem .
-COPY --from=builder /go/src/app/public.pem .
 COPY --from=builder /go/src/app/config.yaml .
 COPY --from=builder /go/src/app/innovation.json .
 
@@ -29,4 +28,7 @@ ENV AUTH_SERVER=$AUTH_SERVER
 ENV SEC_PREFIX=$SEC_PREFIX
 ENV ENVIRONMENT=$ENVIRONMENT
 
-CMD ["api.default.indicoinnovation.pt"]
+RUN apk add dumb-init
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD api.default.indicoinnovation.pt
