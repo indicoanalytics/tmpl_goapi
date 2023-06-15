@@ -15,3 +15,11 @@ func Validate(token string) bool {
 
 	return auth.Jwt != ""
 }
+
+func Generate(claims map[string]interface{}, headers map[string]interface{}) (string, error) {
+	client, context := iam.New()
+
+	authToken, err := client.GenerateJWT(context, headers, claims, crypt.ParsePrivateKeyToString())
+
+	return authToken.Jwt, err
+}
