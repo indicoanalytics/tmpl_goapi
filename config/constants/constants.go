@@ -21,6 +21,13 @@ const (
 	DefaultOTPGenerator       = "iam"
 )
 
+const (
+	Local      = "local"
+	Staging    = "staging"
+	Production = "production"
+	Test       = "test"
+)
+
 var (
 	Debug, _         = strconv.ParseBool(os.Getenv("DEBUG"))
 	GcpProjectID     = os.Getenv("PROJECT")
