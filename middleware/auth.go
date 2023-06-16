@@ -32,7 +32,7 @@ func Authorize() func(context *fiber.Ctx) error {
 			}, http.StatusUnauthorized)
 		}
 
-		if !jwt.Validate(authSpec[1]) {
+		if !jwt.New().Validate(authSpec[1]) {
 			return helpers.CreateResponse(context, &entity.ErrorResponse{
 				Message:    "Unauthorized",
 				StatusCode: http.StatusUnauthorized,
