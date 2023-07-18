@@ -6,5 +6,5 @@ import (
 )
 
 func Log(details *entity.LogDetails, severity string, resourceLabels *map[string]string) {
-	go logging.Log(details, severity, resourceLabels)
+	logging.Log(details, severity, resourceLabels)
 }

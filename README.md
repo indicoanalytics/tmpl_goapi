@@ -33,6 +33,36 @@ A little introduction here...
 
 <hr />
 
+## Deploy
+
+The deploy is performed using some [GCP](https://cloud.google.com/?hl=pt-br) services.
+
+1. Register service account and principal on **Innovation IAM** with the correct permissions.
+
+    Obs.: Use the correct **Innovation IAM Backoffice** accordingly to the destiny environment.
+
+2. Upload all necessary files to right folder in [Bucket](https://console.cloud.google.com/storage) such as `private.pem` and `innovation.json` (download it in **Innovation IAM Backoffice**).
+
+3. Map all environment variables in `.env.example` and provide them in "docker build" step on `cloudbuild.yaml`.
+
+4. Check if `Dockerfile` is receiving all arguments provided in "docker build" step on `cloudbuild.yaml`.
+
+5. Map all configuration variables in `config.example.yaml` and add them to the [Secret Manager](https://console.cloud.google.com/security/secret-manager).
+
+    Obs.: All variables should be prefixed with the project name, to prevent conflict with other projects. Example: **db_string** turns into **`project_name`_db_string**.
+
+6. Create a trigger in [Cloud Build](https://console.cloud.google.com/cloud-build) pointing to the project repository, prefer to use the second gen **Source**.
+
+   * Add all the **substitution variables** provided in `cloudbuild.yaml`.
+
+7. Check if worker pool is created in [Cloud Build](https://console.cloud.google.com/cloud-build).
+
+8. Check if repository is created in [Google Artifact Registry](https://console.cloud.google.com/artifacts).
+
+9. If it's not configured to run automatically when a commit is made to develop or main, run the trigger by commit hash or branch.
+
+While CI/CD is running pay attention if the specified files will be copied and if all the necessary migrations will run.
+
 ## Accepted Methods and Content-Types
 
 | Method | Content-Type |
