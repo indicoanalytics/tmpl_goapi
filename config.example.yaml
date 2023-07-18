@@ -1,7 +1,5 @@
 dbString: postgres://user:password@host:port/dbname
 dbLogMode: 3
-debug: true
 gcpProjectID: innovation-dev-321010
 storageBucket: artifacts.innovation-dev-321010.appspot.com
 storageBaseFolder: agata
-environment: local

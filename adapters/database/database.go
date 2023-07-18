@@ -6,15 +6,22 @@ import (
 	"log"
 
 	"api.default.indicoinnovation.pt/clients/postgres"
+	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/pkg/app"
 	"gorm.io/gorm"
 )
 
+type Database struct{}
+
+func New() *Database {
+	return &Database{}
+}
+
 var errConnectDB = errors.New("error to connect to database")
 
 // Using generics.
-func Query[T interface{}](query string, outputType T, args ...interface{}) (T, error) { //nolint:ireturn
-	gormConn, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+func (db *Database) Query(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
+	gormConn, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
 	defer conn.Close()
 
 	err := gormConn.Raw(query, args...).Scan(&outputType).Error
@@ -22,8 +29,8 @@ func Query[T interface{}](query string, outputType T, args ...interface{}) (T, e
 	return outputType, err
 }
 
-func Exec(query string, args ...interface{}) error {
-	_, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+func (db *Database) Exec(query string, args ...interface{}) error {
+	_, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
 	defer conn.Close()
 
 	err := conn.QueryRow(query, args...).Err()
@@ -31,10 +38,10 @@ func Exec(query string, args ...interface{}) error {
 	return err
 }
 
-func QueryCount(query string, args ...interface{}) (int, error) {
+func (db *Database) QueryCount(query string, args ...interface{}) (int, error) {
 	var count int
 
-	_, conn := Connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, app.Inst.Config.Debug)
+	_, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
 	defer conn.Close()
 
 	err := conn.QueryRow(query, args...).Scan(&count)
@@ -42,7 +49,7 @@ func QueryCount(query string, args ...interface{}) (int, error) {
 	return count, err
 }
 
-func Connect(dbString string, logLevel int, debug bool) (*gorm.DB, *sql.DB) {
+func connect(dbString string, logLevel int, debug bool) (*gorm.DB, *sql.DB) {
 	gormDB, databaseConnection, err := postgres.Connect(dbString, logLevel, debug)
 	if err != nil {
 		log.Panicln(errConnectDB, err)

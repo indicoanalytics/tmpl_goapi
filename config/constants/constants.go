@@ -35,7 +35,7 @@ var (
 	UseTLS           = strings.ToLower(os.Getenv("USE_TLS")) == "true"
 	Environment      = os.Getenv("ENVIRONMENT")
 	Prefork          = strings.ToLower(os.Getenv("PREFORK")) != "false"
-	UseSecretManager = strings.ToLower(os.Getenv("USE_SECRETMANAGER")) == "true"
+	UseSecretManager = strings.ToLower(os.Getenv("USE_SECRETMANAGER")) != "false"
 )
 
 var (
