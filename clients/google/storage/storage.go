@@ -51,7 +51,7 @@ func SignedURL(object string, srcFolder string) (string, error) {
 
 	go logging.Log(&entity.LogDetails{
 		Message: "successfully generated signed url",
-	}, "error", nil)
+	}, "debug", nil)
 
 	return url, nil
 }

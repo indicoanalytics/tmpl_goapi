@@ -68,7 +68,7 @@ func setupSecretManager() *Config {
 	secretList := secretClient.New().ListSecrets(constants.GcpProjectID, constants.SecretPrefix)
 	secretList["db_log_mode"], err = strconv.Atoi(fmt.Sprintf("%s", secretList["db_log_mode"]))
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:     "error to parse secrets",
 			Reason:      err.Error(),
 			RequestData: secretList,
@@ -79,7 +79,7 @@ func setupSecretManager() *Config {
 
 	secretBytes, err := helpers.MapToBytes(secretList)
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:     "error to parse secrets",
 			Reason:      err.Error(),
 			RequestData: secretList,
@@ -90,7 +90,7 @@ func setupSecretManager() *Config {
 
 	err = helpers.Unmarshal(secretBytes, config)
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:     "error to parse secrets",
 			Reason:      err.Error(),
 			RequestData: secretBytes,

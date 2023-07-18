@@ -24,7 +24,7 @@ func newClient() (context.Context, *secretmanager.Client) {
 
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message: "error while trying to connect to google cloud secret manager",
 			Reason:  err.Error(),
 		}, "critical", nil)
@@ -59,7 +59,7 @@ func (secretmanager *GCPSecretManager) ListSecrets(parent string, filterPrefix s
 		}
 
 		if err != nil {
-			go logging.Log(&entity.LogDetails{
+			logging.Log(&entity.LogDetails{
 				Message: "error to get next secret in google secret manager",
 				Reason:  err.Error(),
 			}, "critical", nil)
@@ -90,7 +90,7 @@ func (secretmanager *GCPSecretManager) accessSecretVersion(version string) strin
 		Name: version,
 	})
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message: "error to access secret version in google secret manager",
 			Reason:  err.Error(),
 		}, "critical", nil)
