@@ -9,3 +9,9 @@ func Contains(s []string, str string) bool {
 
 	return false
 }
+
+func MapToBytes(datamap map[string]interface{}) ([]byte, error) {
+	databyte, err := Marshal(datamap)
+
+	return databyte, err
+}

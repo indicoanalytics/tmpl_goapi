@@ -1,31 +1,28 @@
 package config
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
+	"strconv"
 
+	"api.default.indicoinnovation.pt/adapters/logging"
+	secretClient "api.default.indicoinnovation.pt/clients/google/secretmanager"
 	"api.default.indicoinnovation.pt/config/constants"
+	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/helpers"
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"github.com/spf13/viper"
-	"google.golang.org/api/iterator"
 )
 
 type Config struct {
 	Port              string `json:"port"`
 	DBString          string `json:"database_url"`
 	DBLogMode         int    `json:"db_log_mode"`
-	Debug             bool   `json:"debug"`
 	GcpProjectID      string `json:"project_id"`
 	StorageBucket     string `json:"storage_bucket"`
 	StorageBaseFolder string `json:"storage_base_folder"`
-	Environment       string `json:"environment"`
 }
 
 func New() *Config {
@@ -54,85 +51,53 @@ func setupLocal() *Config {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
 
+	if constants.Environment == constants.Test {
+		log.Printf("Using Test Database")
+		config.DBString = os.Getenv("TEST_DATABASE_URL")
+	}
+
 	return config
 }
 
 func setupSecretManager() *Config {
 	var (
-		config     *Config
-		secretList = map[string]interface{}{}
+		err    error
+		config = &Config{}
 	)
 
-	ctx := context.Background()
-	secretClient, err := secretmanager.NewClient(ctx)
+	secretList := secretClient.New().ListSecrets(constants.GcpProjectID, constants.SecretPrefix)
+	secretList["db_log_mode"], err = strconv.Atoi(fmt.Sprintf("%s", secretList["db_log_mode"]))
 	if err != nil {
-		log.Fatalf("Error while trying to connect to Google Cloud Secret Manager, exited with error: %v", err)
-	}
-	defer secretClient.Close()
+		go logging.Log(&entity.LogDetails{
+			Message:     "error to parse secrets",
+			Reason:      err.Error(),
+			RequestData: secretList,
+		}, "critical", nil)
 
-	filterPrefix := constants.SecretPrefix
-	if filterPrefix == "" {
-		filterPrefix = "*"
-	}
-	secrets := secretClient.ListSecrets(ctx, &secretmanagerpb.ListSecretsRequest{
-		Parent: fmt.Sprintf("projects/%s", constants.GcpProjectID),
-		Filter: fmt.Sprintf("Name: %s", filterPrefix),
-	})
-	for {
-		secret, err := secrets.Next()
-		if errors.Is(err, iterator.Done) {
-			break
-		}
-
-		if err != nil {
-			break
-		}
-
-		splitSecret := strings.Split(secret.Name, "/")
-		secretName := splitSecret[len(splitSecret)-1]
-
-		if constants.SecretPrefix != "" {
-			if strings.Contains(secretName, constants.SecretPrefix) {
-				secretName = strings.Split(secretName, constants.SecretPrefix)[1]
-			}
-		}
-
-		secretList[secretName] = accessSecretVersion(fmt.Sprintf("%s/versions/latest", secret.Name))
+		panic(err)
 	}
 
-	config = &Config{}
-
-	err = helpers.Unmarshal(secretToBytes(secretList), config)
+	secretBytes, err := helpers.MapToBytes(secretList)
 	if err != nil {
-		panic("error to parse secrets")
+		go logging.Log(&entity.LogDetails{
+			Message:     "error to parse secrets",
+			Reason:      err.Error(),
+			RequestData: secretList,
+		}, "critical", nil)
+
+		panic(err)
+	}
+
+	err = helpers.Unmarshal(secretBytes, config)
+	if err != nil {
+		go logging.Log(&entity.LogDetails{
+			Message:     "error to parse secrets",
+			Reason:      err.Error(),
+			RequestData: secretBytes,
+		}, "critical", nil)
+
+		panic(err)
 	}
 
 	return config
-}
-
-func secretToBytes(secretMap map[string]interface{}) []byte {
-	byteSecrets, err := helpers.Marshal(secretMap)
-	if err != nil {
-		panic("Error to unmarshal configs from Google Cloud")
-	}
-
-	return byteSecrets
-}
-
-func accessSecretVersion(version string) string {
-	ctx := context.Background()
-	client, err := secretmanager.NewClient(ctx)
-	if err != nil {
-		panic(fmt.Sprintf("failed to create secretmanager client: %v", err))
-	}
-	defer client.Close()
-
-	result, err := client.AccessSecretVersion(ctx, &secretmanagerpb.AccessSecretVersionRequest{
-		Name: version,
-	})
-	if err != nil {
-		panic(fmt.Sprintf("failed to access secret version: %v", err))
-	}
-
-	return string(result.Payload.Data)
 }
