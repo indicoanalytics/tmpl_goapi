@@ -39,10 +39,22 @@ var (
 )
 
 var (
+	EmailProvider = "mailgun"
+	SMSProvider   = ""
+
+	ChannelEmail = "email"
+	ChannelSMS   = "sms"
+)
+
+var (
 	AllowedContentTypes   = []string{fiber.MIMEApplicationJSON}
 	AllowedHeaders        = "X-Session-Id, Authorization, Content-Type, Accept, Origin"
 	AllowedMethods        = "GET,POST,OPTIONS"
 	AllowedOrigins        = "https://tbd, https://tbd"
 	AllowedStageOrigins   = "https://localhost:3000, http://localhost:3000"
 	AllowedUnthrottledIPs = []string{"127.0.0.1"}
+)
+
+const (
+	TemplatesFolder = "templates"
 )

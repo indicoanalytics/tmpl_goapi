@@ -17,12 +17,16 @@ import (
 )
 
 type Config struct {
-	Port              string `json:"port"`
-	DBString          string `json:"database_url"`
-	DBLogMode         int    `json:"db_log_mode"`
-	GcpProjectID      string `json:"project_id"`
-	StorageBucket     string `json:"storage_bucket"`
-	StorageBaseFolder string `json:"storage_base_folder"`
+	Port               string `json:"port"`
+	DBString           string `json:"database_url"`
+	DBLogMode          int    `json:"db_log_mode"`
+	GcpProjectID       string `json:"project_id"`
+	StorageBucket      string `json:"storage_bucket"`
+	StorageBaseFolder  string `json:"storage_base_folder"`
+	MailGunDomain      string `json:"mailgun_domain"`
+	MailGunKey         string `json:"mailgun_key"`
+	EmailSenderAddress string `json:"email_sender_address"`
+	EmailSenderLabel   string `json:"email_sender_label"`
 }
 
 func New() *Config {
