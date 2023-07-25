@@ -3,3 +3,7 @@ dbLogMode: 3
 gcpProjectID: innovation-dev-321010
 storageBucket: artifacts.innovation-dev-321010.appspot.com
 storageBaseFolder: agata
+mailgunKey:
+mailgunDomain:
+emailSenderAddress:
+emailSenderLabel:

@@ -12,11 +12,13 @@ import (
 	"github.com/google/uuid"
 )
 
-var ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
-var defaultHeaders = map[string]interface{}{
-	"alg": "RS512",
-	"typ": "JWT",
-}
+var (
+	ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
+	defaultHeaders             = map[string]interface{}{
+		"alg": "RS512",
+		"typ": "JWT",
+	}
+)
 
 type JWT struct{}
 
