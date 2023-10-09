@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"mime/multipart"
 	"net/http"
 	"net/url"
 
@@ -9,34 +8,34 @@ import (
 )
 
 type Request struct {
-	Method           string          `json:"method"`
-	URL              string          `json:"url"`
-	Proto            string          `json:"proto"`
-	Header           interface{}     `json:"header"`
-	Body             interface{}     `json:"body"`
-	QueryParams      interface{}     `json:"query_params"`
-	ContentLength    int64           `json:"content_length"`
-	TransferEncoding []string        `json:"transfer_encoding"`
-	Host             string          `json:"host"`
-	Form             url.Values      `json:"form"`
-	PostForm         url.Values      `json:"post_form"`
-	MultipartForm    *multipart.Form `json:"multipart_form"`
-	RemoteAddr       string          `json:"remote_addr"`
+	Header        interface{}       `json:"header"`
+	Proto         string            `json:"proto"`
+	ContentLength int64             `json:"content_length"`
+	Host          string            `json:"host"`
+	RemoteAddr    string            `json:"remote_addr"`
+	RemoteIP      string            `json:"ipaddress"`
+	Method        string            `json:"method"`
+	URL           string            `json:"route"`
+	Body          interface{}       `json:"body"`
+	QueryParams   url.Values        `json:"query_params"`
+	Params        map[string]string `json:"params"`
 }
 
 func FromHTTPRequest(context *fiber.Ctx) *Request {
-	multipartform, _ := context.MultipartForm()
+	queryParams, _ := url.ParseQuery(string(context.Request().URI().QueryString()))
+
 	req := &Request{
-		Method:        context.Method(),
-		URL:           context.OriginalURL(),
-		Proto:         context.Protocol(),
 		Header:        context.GetReqHeaders(),
+		Proto:         context.Protocol(),
 		ContentLength: int64(context.Request().Header.ContentLength()),
 		Host:          context.Hostname(),
-		MultipartForm: multipartform,
 		RemoteAddr:    context.IP(),
-		Body:          string(context.Body()),
-		QueryParams:   context.Context().QueryArgs().QueryString(),
+		RemoteIP:      context.IP(),
+		Method:        context.Method(),
+		URL:           context.OriginalURL(),
+		QueryParams:   queryParams,
+		Params:        context.AllParams(),
+		Body:          parseBody(context),
 	}
 
 	return req
@@ -49,4 +48,29 @@ func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) erro
 	}
 
 	return context.Status(returnStatus).JSON(payload)
+}
+
+func parseBody(context *fiber.Ctx) interface{} {
+	contentType := context.Get("Content-Type")
+
+	if contentType == fiber.MIMEApplicationJSON {
+		response := map[string]interface{}{}
+		_ = Unmarshal(context.Body(), &response)
+
+		return response
+	}
+
+	if contentType == fiber.MIMEMultipartForm {
+		response, _ := context.MultipartForm()
+
+		return response
+	}
+
+	if contentType == fiber.MIMEApplicationForm {
+		response, _ := url.ParseQuery(string(context.Body()))
+
+		return response
+	}
+
+	return string(context.Body())
 }
