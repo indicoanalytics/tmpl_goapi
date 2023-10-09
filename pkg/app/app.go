@@ -78,10 +78,10 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 
 	go logging.Log(
 		&entity.LogDetails{
-			Message:     message,
-			Reason:      err.Error(),
-			StatusCode:  code,
-			RequestData: string(context.Body()),
+			Message:    message,
+			Reason:     err.Error(),
+			StatusCode: code,
+			Request:    helpers.FromHTTPRequest(context),
 		},
 		"critical",
 		nil,

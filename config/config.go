@@ -73,9 +73,9 @@ func setupSecretManager() *Config {
 	secretList["db_log_mode"], err = strconv.Atoi(fmt.Sprintf("%s", secretList["db_log_mode"]))
 	if err != nil {
 		logging.Log(&entity.LogDetails{
-			Message:     "error to parse secrets",
-			Reason:      err.Error(),
-			RequestData: secretList,
+			Message:  "error to parse secrets",
+			Reason:   err.Error(),
+			Response: secretList,
 		}, "critical", nil)
 
 		panic(err)
@@ -84,9 +84,9 @@ func setupSecretManager() *Config {
 	secretBytes, err := helpers.MapToBytes(secretList)
 	if err != nil {
 		logging.Log(&entity.LogDetails{
-			Message:     "error to parse secrets",
-			Reason:      err.Error(),
-			RequestData: secretList,
+			Message:  "error to parse secrets",
+			Reason:   err.Error(),
+			Response: secretList,
 		}, "critical", nil)
 
 		panic(err)
@@ -95,9 +95,9 @@ func setupSecretManager() *Config {
 	err = helpers.Unmarshal(secretBytes, config)
 	if err != nil {
 		logging.Log(&entity.LogDetails{
-			Message:     "error to parse secrets",
-			Reason:      err.Error(),
-			RequestData: secretBytes,
+			Message:  "error to parse secrets",
+			Reason:   err.Error(),
+			Response: secretBytes,
 		}, "critical", nil)
 
 		panic(err)

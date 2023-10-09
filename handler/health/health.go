@@ -1,35 +1,26 @@
 package health
 
 import (
-	"net/http"
-
+	"api.default.indicoinnovation.pt/adapters/response"
 	"api.default.indicoinnovation.pt/app/usecases/health"
-	"api.default.indicoinnovation.pt/entity"
-	"api.default.indicoinnovation.pt/pkg/helpers"
+	"api.default.indicoinnovation.pt/config/constants"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Handler struct {
-	uc *health.Usecase
+	usecase *health.Usecase
 }
 
 func Handle() *Handler {
 	return &Handler{
-		uc: health.New(),
+		usecase: health.New(),
 	}
 }
 
 func (handler *Handler) Check(context *fiber.Ctx) error {
-	// timeNow := time.Now().UTC()
-	if _, err := handler.uc.Check(); err != nil {
-		return helpers.CreateResponse(context, &entity.SuccessfulResponse{
-			Message:    err.Error(),
-			StatusCode: http.StatusInternalServerError,
-		})
+	if _, err := handler.usecase.Check(); err != nil {
+		return response.CreateError(context, err, "error to check health", nil, constants.HTTPStatusInternalServerError)
 	}
 
-	return helpers.CreateResponse(context, &entity.SuccessfulResponse{
-		Message:    "OK",
-		StatusCode: http.StatusOK,
-	})
+	return response.CreateSuccess(context, "success to check health", nil, constants.HTTPStatusOK)
 }

@@ -58,3 +58,5 @@ var (
 const (
 	TemplatesFolder = "templates"
 )
+
+var MappedClientErrors = []error{}
