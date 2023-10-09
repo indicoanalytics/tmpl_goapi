@@ -43,9 +43,9 @@ func parseTemplate(templateName string, args ...map[string]interface{}) (string,
 	tmpl, err = template.ParseFiles(fmt.Sprintf("%s/%s", constants.TemplatesFolder, templateName))
 	if err != nil {
 		go logging.Log(&entity.LogDetails{
-			Message:     "error to get email template",
-			RequestData: templateName,
-			Reason:      err.Error(),
+			Message: "error to get email template",
+			Request: templateName,
+			Reason:  err.Error(),
 		}, "critical", nil)
 
 		return "", err
@@ -55,9 +55,9 @@ func parseTemplate(templateName string, args ...map[string]interface{}) (string,
 		err = tmpl.Execute(&content, args[0])
 		if err != nil {
 			go logging.Log(&entity.LogDetails{
-				Message:     "error to bind args in email template",
-				Reason:      err.Error(),
-				RequestData: args,
+				Message: "error to bind args in email template",
+				Reason:  err.Error(),
+				Request: args,
 			}, "critical", nil)
 
 			return "", err
@@ -83,9 +83,9 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	form, contentType, err := helpers.WriteFormData(emailData)
 	if err != nil {
 		go logging.Log(&entity.LogDetails{
-			Message:     "error to parse mailgun email body",
-			Reason:      err.Error(),
-			RequestData: fmt.Sprintf("%+v", form),
+			Message: "error to parse mailgun email body",
+			Reason:  err.Error(),
+			Request: fmt.Sprintf("%+v", form),
 		}, "critical", nil)
 
 		return
@@ -104,10 +104,10 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	response, err := request.Call()
 	if err != nil {
 		go logging.Log(&entity.LogDetails{
-			Message:      "error to send email through mailgun",
-			Reason:       err.Error(),
-			RequestData:  fmt.Sprintf("%+v", request),
-			ResponseData: response,
+			Message:  "error to send email through mailgun",
+			Reason:   err.Error(),
+			Request:  fmt.Sprintf("%+v", request),
+			Response: response,
 		}, "critical", nil)
 
 		return
@@ -115,32 +115,31 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 
 	if !helpers.Contains(constants.HTTPStatusesOk, fmt.Sprintf("%d", response.StatusCode)) {
 		go logging.Log(&entity.LogDetails{
-			Message:      "status code error while sending email through mailgun",
-			RequestData:  fmt.Sprintf("%+v", request),
-			ResponseData: string(response.Message),
-			StatusCode:   response.StatusCode,
+			Message:    "status code error while sending email through mailgun",
+			Request:    fmt.Sprintf("%+v", request),
+			Response:   string(response.Message),
+			StatusCode: response.StatusCode,
 		}, "critical", nil)
 
 		return
 	}
 
 	var responseMessage mailgunResponse
-
 	err = json.Unmarshal(response.Message, &responseMessage)
 	if err != nil {
 		go logging.Log(&entity.LogDetails{
-			Message:      "error to unmarshal mailgun response",
-			Reason:       err.Error(),
-			RequestData:  fmt.Sprintf("%+v", request),
-			ResponseData: string(response.Message),
+			Message:  "error to unmarshal mailgun response",
+			Reason:   err.Error(),
+			Request:  fmt.Sprintf("%+v", request),
+			Response: string(response.Message),
 		}, "critical", nil)
 
 		return
 	}
 
 	go logging.Log(&entity.LogDetails{
-		Message:      "email successfully sent through mailgun",
-		RequestData:  fmt.Sprintf("%+v", request),
-		ResponseData: responseMessage,
+		Message:  "email successfully sent through mailgun",
+		Request:  fmt.Sprintf("%+v", request),
+		Response: responseMessage,
 	}, "info", nil)
 }

@@ -32,7 +32,7 @@ func Publish(topicID string, message interface{}) {
 		logging.Log(&entity.LogDetails{
 			Message: "error to marshal message before publishing it to messaging service",
 			Reason:  err.Error(),
-			RequestData: map[string]interface{}{
+			Request: map[string]interface{}{
 				"queue_name": topicID,
 				"message":    message,
 			},
@@ -55,11 +55,11 @@ func Publish(topicID string, message interface{}) {
 		logging.Log(&entity.LogDetails{
 			Message: "error to publish message to google pubsub",
 			Reason:  err.Error(),
-			RequestData: map[string]interface{}{
+			Request: map[string]interface{}{
 				"message":  message,
 				"topic_id": topicID,
 			},
-			ResponseData: map[string]interface{}{"server_id": serverID},
+			Response: map[string]interface{}{"server_id": serverID},
 		}, "critical", nil)
 
 		panic(err)
@@ -67,10 +67,10 @@ func Publish(topicID string, message interface{}) {
 
 	logging.Log(&entity.LogDetails{
 		Message: "message successfully published to google pubsub",
-		RequestData: map[string]interface{}{
+		Request: map[string]interface{}{
 			"message":  message,
 			"topic_id": topicID,
 		},
-		ResponseData: map[string]interface{}{"server_id": serverID},
+		Response: map[string]interface{}{"server_id": serverID},
 	}, "debug", nil)
 }

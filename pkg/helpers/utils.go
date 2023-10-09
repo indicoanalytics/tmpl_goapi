@@ -2,12 +2,23 @@ package helpers
 
 import (
 	"bytes"
+	"errors"
 	"mime/multipart"
 )
 
 func Contains(s []string, str string) bool {
 	for _, v := range s {
 		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ContainsError(e []error, target error) bool {
+	for _, v := range e {
+		if errors.Is(v, target) {
 			return true
 		}
 	}
