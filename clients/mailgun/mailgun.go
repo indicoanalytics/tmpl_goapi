@@ -13,7 +13,7 @@ import (
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/app"
 	"api.default.indicoinnovation.pt/pkg/helpers"
-	requestsnippet "github.com/INDICO-INNOVATION/go-request-snippet"
+	requestsnippet "github.com/indicoinnovation/go-request-snippet"
 )
 
 type Mailgun struct {

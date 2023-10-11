@@ -5,13 +5,13 @@ go 1.20
 require (
 	cloud.google.com/go/secretmanager v1.10.0
 	cloud.google.com/go/storage v1.29.0
-	github.com/INDICO-INNOVATION/gcp_logging_easycall v1.0.0
-	github.com/INDICO-INNOVATION/go-request-snippet v1.0.1
-	github.com/INDICO-INNOVATION/indico_service_auth v1.30.0
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.1
+	github.com/indicoinnovation/gcp_logging_easycall v1.0.1
+	github.com/indicoinnovation/go-request-snippet v1.0.3
+	github.com/indicoinnovation/indico_service_auth v1.30.2
 	github.com/spf13/viper v1.15.0
 	golang.org/x/crypto v0.11.0
 	google.golang.org/api v0.124.0

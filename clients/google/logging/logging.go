@@ -3,7 +3,7 @@ package logging
 import (
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
-	gcpLogging "github.com/INDICO-INNOVATION/gcp_logging_easycall"
+	gcpLogging "github.com/indicoinnovation/gcp_logging_easycall"
 )
 
 func Log(message *entity.LogDetails, severity string, resourceLabels *map[string]string) {
