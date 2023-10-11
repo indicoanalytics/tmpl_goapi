@@ -6,7 +6,7 @@ import (
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/entity"
-	indicoserviceauth "github.com/INDICO-INNOVATION/indico_service_auth"
+	indicoserviceauth "github.com/indicoinnovation/indico_service_auth"
 )
 
 var errIAMConnection = errors.New("error to connect to iam client, this could happen due to system outages, or unsupported errors")
