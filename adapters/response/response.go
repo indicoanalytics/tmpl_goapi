@@ -1,6 +1,8 @@
 package response
 
 import (
+	"strings"
+
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
@@ -15,7 +17,7 @@ func CreateError(context *fiber.Ctx, err error, message string, response interfa
 	}
 
 	go logging.Log(&entity.LogDetails{
-		Message:    message,
+		Message:    strings.ToLower(message),
 		Reason:     err.Error(),
 		Request:    helpers.FromHTTPRequest(context),
 		Response:   response,
@@ -36,7 +38,7 @@ func CreateSuccess(context *fiber.Ctx, message string, response interface{}, sta
 	}
 
 	go logging.Log(&entity.LogDetails{
-		Message:    message,
+		Message:    strings.ToLower(message),
 		StatusCode: httpCode,
 		Request:    helpers.FromHTTPRequest(context),
 		Response:   response,
