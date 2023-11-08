@@ -5,7 +5,7 @@ A little introduction here...
 <hr />
 
 ## **Requirements**
-- Golang 1.20 or higher
+- Golang 1.21 or higher
 - Openssl3
 
 <hr />
