@@ -19,7 +19,7 @@ setup: go.mod
 	@sleep 2
 
 	@echo "`tput bold`#### Installing dependencies to your project ####`tput sgr0`"
-	go mod tidy -go=1.21
+	go mod tidy
 
 	go get -u golang.org/x/lint/golint
 	go install golang.org/x/lint/golint
