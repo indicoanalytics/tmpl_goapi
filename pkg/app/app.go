@@ -30,7 +30,9 @@ func ApplicationInit() {
 	configs := config.New()
 	ctx := context.Background()
 
-	iam.New()
+	if constants.Environment != constants.Test {
+		iam.New()
+	}
 
 	Inst = &Application{
 		Config: configs,

@@ -13,7 +13,6 @@ type Request struct {
 	ContentLength int64             `json:"content_length"`
 	Host          string            `json:"host"`
 	RemoteAddr    string            `json:"remote_addr"`
-	RemoteIP      string            `json:"ipaddress"`
 	Method        string            `json:"method"`
 	URL           string            `json:"route"`
 	Body          interface{}       `json:"body"`
@@ -22,6 +21,7 @@ type Request struct {
 }
 
 func FromHTTPRequest(context *fiber.Ctx) *Request {
+	return &Request{}
 	queryParams, _ := url.ParseQuery(string(context.Request().URI().QueryString()))
 
 	req := &Request{
@@ -30,24 +30,14 @@ func FromHTTPRequest(context *fiber.Ctx) *Request {
 		ContentLength: int64(context.Request().Header.ContentLength()),
 		Host:          context.Hostname(),
 		RemoteAddr:    context.IP(),
-		RemoteIP:      context.IP(),
 		Method:        context.Method(),
-		URL:           context.OriginalURL(),
+		URL:           context.Path(),
 		QueryParams:   queryParams,
 		Params:        context.AllParams(),
 		Body:          parseBody(context),
 	}
 
 	return req
-}
-
-func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) error {
-	returnStatus := http.StatusOK
-	if len(status) > 0 {
-		returnStatus = status[0]
-	}
-
-	return context.Status(returnStatus).JSON(payload)
 }
 
 func parseBody(context *fiber.Ctx) interface{} {
@@ -60,17 +50,26 @@ func parseBody(context *fiber.Ctx) interface{} {
 		return response
 	}
 
-	if contentType == fiber.MIMEMultipartForm {
-		response, _ := context.MultipartForm()
+	// if contentType == fiber.MIMEMultipartForm {
+	// 	response, _ := context.MultipartForm()
 
-		return response
+	// 	return response
+	// }
+
+	// if contentType == fiber.MIMEApplicationForm {
+	// 	response, _ := url.ParseQuery(string(context.Body()))
+
+	// 	return response
+	// }
+
+	return nil
+}
+
+func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) error {
+	returnStatus := http.StatusOK
+	if len(status) > 0 {
+		returnStatus = status[0]
 	}
 
-	if contentType == fiber.MIMEApplicationForm {
-		response, _ := url.ParseQuery(string(context.Body()))
-
-		return response
-	}
-
-	return string(context.Body())
+	return context.Status(returnStatus).JSON(payload)
 }

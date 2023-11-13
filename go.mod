@@ -14,7 +14,7 @@ require (
 	github.com/indicoinnovation/go-request-snippet v1.0.3
 	github.com/indicoinnovation/indico_service_auth v1.30.2
 	github.com/spf13/viper v1.17.0
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.15.0
 	google.golang.org/api v0.143.0
 	gorm.io/driver/postgres v1.5.0
 	gorm.io/gorm v1.25.0
@@ -73,11 +73,11 @@ require (
 	github.com/valyala/fasthttp v1.49.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.16.0 // indirect
+	golang.org/x/net v0.18.0 // indirect
 	golang.org/x/oauth2 v0.12.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230913181813-007df8e322eb // indirect

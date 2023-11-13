@@ -59,4 +59,15 @@ const (
 	TemplatesFolder = "templates"
 )
 
+type LoggingSeverity string
+
+const (
+	SeverityDebug     LoggingSeverity = "debug"
+	SeverityInfo      LoggingSeverity = "info"
+	SeverityWarning   LoggingSeverity = "warning"
+	SeverityError     LoggingSeverity = "error"
+	SeverityCritical  LoggingSeverity = "critical"
+	SeverityEmergency LoggingSeverity = "emergency"
+)
+
 var MappedClientErrors = []error{}
