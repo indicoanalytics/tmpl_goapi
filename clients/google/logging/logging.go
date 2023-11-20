@@ -1,12 +1,14 @@
 package logging
 
 import (
+	"context"
+
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
 	gcpLogging "github.com/indicoinnovation/gcp_logging_easycall"
 )
 
-func Log(message *entity.LogDetails, severity string, resourceLabels *map[string]string) {
+func Log(_ context.Context, message *entity.LogDetails, severity constants.LoggingSeverity, resourceLabels *map[string]string) {
 	labels := map[string]string{"service": constants.MainServiceName}
 	if resourceLabels != nil {
 		for k, v := range *resourceLabels {
@@ -18,7 +20,7 @@ func Log(message *entity.LogDetails, severity string, resourceLabels *map[string
 		constants.GcpProjectID,
 		constants.MainLoggerName,
 		message,
-		severity,
+		string(severity),
 		"api",
 		labels,
 	)

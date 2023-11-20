@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -19,6 +20,7 @@ const (
 	DefaultLimit              = 10
 	DefaultOffset             = 0
 	DefaultOTPGenerator       = "iam"
+	DefaultContextTimeout     = 100 * time.Millisecond
 )
 
 const (
@@ -69,5 +71,3 @@ const (
 	SeverityCritical  LoggingSeverity = "critical"
 	SeverityEmergency LoggingSeverity = "emergency"
 )
-
-var MappedClientErrors = []error{}
