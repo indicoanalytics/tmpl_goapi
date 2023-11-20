@@ -2,11 +2,10 @@ module api.default.indicoinnovation.pt
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	cloud.google.com/go/secretmanager v1.11.1
 	cloud.google.com/go/storage v1.30.1
+	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -22,7 +21,6 @@ require (
 )
 
 require (
-	github.com/georgysavva/scany/v2 v2.0.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
