@@ -22,7 +22,7 @@ func Handle() *Handler {
 func (handler *Handler) Check(context *fiber.Ctx) error {
 	check, err := handler.usecase.Check()
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:    "error to health check",
 			Context:    context,
 			StatusCode: constants.HTTPStatusInternalServerError,
@@ -36,7 +36,7 @@ func (handler *Handler) Check(context *fiber.Ctx) error {
 		}, constants.HTTPStatusInternalServerError)
 	}
 
-	go logging.Log(&entity.LogDetails{
+	logging.Log(&entity.LogDetails{
 		Message:    "successfully health checked",
 		Context:    context,
 		StatusCode: constants.HTTPStatusOK,

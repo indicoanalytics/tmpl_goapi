@@ -20,49 +20,8 @@ type Request struct {
 	Params        map[string]string `json:"params"`
 }
 
-func FromHTTPRequest(context *fiber.Ctx) *Request {
+func FromHTTPRequest(_ *fiber.Ctx) *Request {
 	return &Request{}
-	queryParams, _ := url.ParseQuery(string(context.Request().URI().QueryString()))
-
-	req := &Request{
-		Header:        context.GetReqHeaders(),
-		Proto:         context.Protocol(),
-		ContentLength: int64(context.Request().Header.ContentLength()),
-		Host:          context.Hostname(),
-		RemoteAddr:    context.IP(),
-		Method:        context.Method(),
-		URL:           context.Path(),
-		QueryParams:   queryParams,
-		Params:        context.AllParams(),
-		Body:          parseBody(context),
-	}
-
-	return req
-}
-
-func parseBody(context *fiber.Ctx) interface{} {
-	contentType := context.Get("Content-Type")
-
-	if contentType == fiber.MIMEApplicationJSON {
-		response := map[string]interface{}{}
-		_ = Unmarshal(context.Body(), &response)
-
-		return response
-	}
-
-	// if contentType == fiber.MIMEMultipartForm {
-	// 	response, _ := context.MultipartForm()
-
-	// 	return response
-	// }
-
-	// if contentType == fiber.MIMEApplicationForm {
-	// 	response, _ := url.ParseQuery(string(context.Body()))
-
-	// 	return response
-	// }
-
-	return nil
 }
 
 func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) error {

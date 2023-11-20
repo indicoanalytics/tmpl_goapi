@@ -8,7 +8,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"api.default.indicoinnovation.pt/clients/google/logging"
+	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/pkg/app"
@@ -42,7 +42,7 @@ func parseTemplate(templateName string, args ...map[string]interface{}) (string,
 
 	tmpl, err = template.ParseFiles(fmt.Sprintf("%s/%s", constants.TemplatesFolder, templateName))
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message: "error to get email template",
 			Request: templateName,
 			Reason:  err.Error(),
@@ -54,7 +54,7 @@ func parseTemplate(templateName string, args ...map[string]interface{}) (string,
 	if len(args) > 0 {
 		err = tmpl.Execute(&content, args[0])
 		if err != nil {
-			go logging.Log(&entity.LogDetails{
+			logging.Log(&entity.LogDetails{
 				Message: "error to bind args in email template",
 				Reason:  err.Error(),
 				Request: args,
@@ -103,7 +103,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 
 	response, err := request.Call()
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:  "error to send email through mailgun",
 			Reason:   err.Error(),
 			Request:  fmt.Sprintf("%+v", request),
@@ -114,7 +114,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	}
 
 	if !helpers.Contains(constants.HTTPStatusesOk, fmt.Sprintf("%d", response.StatusCode)) {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:    "status code error while sending email through mailgun",
 			Request:    fmt.Sprintf("%+v", request),
 			Response:   string(response.Message),
@@ -127,7 +127,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	var responseMessage mailgunResponse
 	err = json.Unmarshal(response.Message, &responseMessage)
 	if err != nil {
-		go logging.Log(&entity.LogDetails{
+		logging.Log(&entity.LogDetails{
 			Message:  "error to unmarshal mailgun response",
 			Reason:   err.Error(),
 			Request:  fmt.Sprintf("%+v", request),
@@ -137,7 +137,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 		return
 	}
 
-	go logging.Log(&entity.LogDetails{
+	logging.Log(&entity.LogDetails{
 		Message:  "email successfully sent through mailgun",
 		Request:  fmt.Sprintf("%+v", request),
 		Response: responseMessage,
