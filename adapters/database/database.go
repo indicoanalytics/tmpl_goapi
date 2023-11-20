@@ -15,6 +15,22 @@ func New() *Database {
 	return &Database{}
 }
 
+func Query(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
+	return New().Query(query, outputType, args...)
+}
+
+func Exec(query string, args ...interface{}) error {
+	return New().Exec(query, args...)
+}
+
+func QueryOne(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
+	return New().QueryOne(query, outputType, args...)
+}
+
+func QueryCount(query string, args ...interface{}) (int, error) {
+	return New().QueryCount(query, args...)
+}
+
 func (db *Database) Query(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
 	err := pgxscan.Select(context.Background(), app.Inst.DB, outputType, query, args...)
 
