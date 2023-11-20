@@ -18,9 +18,10 @@ func Handle() *Handler {
 }
 
 func (handler *Handler) Check(context *fiber.Ctx) error {
-	if _, err := handler.usecase.Check(); err != nil {
-		return response.CreateError(context, err, "error to check health", nil, constants.HTTPStatusInternalServerError)
+	check, err := handler.usecase.Check()
+	if err != nil {
+		return response.CreateError(context, err, "error to check health", check, constants.HTTPStatusInternalServerError)
 	}
 
-	return response.CreateSuccess(context, "success to check health", nil, constants.HTTPStatusOK)
+	return response.CreateSuccess(context, "success to check health", check, constants.HTTPStatusOK)
 }

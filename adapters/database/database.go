@@ -1,14 +1,12 @@
 package database
 
 import (
-	"database/sql"
+	"context"
 	"errors"
-	"log"
 
-	"api.default.indicoinnovation.pt/clients/postgres"
-	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/pkg/app"
-	"gorm.io/gorm"
+	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 )
 
 type Database struct{}
@@ -17,43 +15,38 @@ func New() *Database {
 	return &Database{}
 }
 
-var errConnectDB = errors.New("error to connect to database")
-
-// Using generics.
 func (db *Database) Query(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
-	gormConn, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
-	defer conn.Close()
-
-	err := gormConn.Raw(query, args...).Scan(&outputType).Error
+	err := pgxscan.Select(context.Background(), app.Inst.DB, outputType, query, args...)
 
 	return outputType, err
 }
 
 func (db *Database) Exec(query string, args ...interface{}) error {
-	_, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
-	defer conn.Close()
-
-	err := conn.QueryRow(query, args...).Err()
+	_, err := app.Inst.DB.Exec(context.Background(), query, args...)
 
 	return err
 }
 
-func (db *Database) QueryCount(query string, args ...interface{}) (int, error) {
-	var count int
-
-	_, conn := connect(app.Inst.Config.DBString, app.Inst.Config.DBLogMode, constants.Debug)
-	defer conn.Close()
-
-	err := conn.QueryRow(query, args...).Scan(&count)
-
-	return count, err
-}
-
-func connect(dbString string, logLevel int, debug bool) (*gorm.DB, *sql.DB) {
-	gormDB, databaseConnection, err := postgres.Connect(dbString, logLevel, debug)
-	if err != nil {
-		log.Panicln(errConnectDB, err)
+func (db *Database) QueryOne(query string, outputType interface{}, args ...interface{}) (interface{}, error) {
+	err := pgxscan.Get(context.Background(), app.Inst.DB, outputType, query, args...)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = nil
 	}
 
-	return gormDB, databaseConnection
+	return outputType, err
+}
+
+func (db *Database) QueryCount(query string, args ...interface{}) (int, error) {
+	type Count struct {
+		Count int `json:"count"`
+	}
+
+	rows := &Count{}
+
+	err := pgxscan.Get(context.Background(), app.Inst.DB, rows, query, args...)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = nil
+	}
+
+	return rows.Count, err
 }

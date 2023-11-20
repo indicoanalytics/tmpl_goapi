@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -14,10 +15,12 @@ import (
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Application struct {
 	Config *config.Config
+	DB     *pgxpool.Pool
 	Server *fiber.App
 }
 
@@ -25,6 +28,7 @@ var Inst *Application
 
 func ApplicationInit() {
 	configs := config.New()
+	ctx := context.Background()
 
 	iam.New()
 
@@ -38,6 +42,17 @@ func ApplicationInit() {
 			Prefork:      constants.Prefork,
 		}),
 	}
+
+	dbpool, err := pgxpool.New(ctx, Inst.Config.DBString)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = dbpool.Ping(ctx); err != nil {
+		panic(err)
+	}
+
+	Inst.DB = dbpool
 }
 
 func Setup() {
