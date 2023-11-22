@@ -45,16 +45,7 @@ func ApplicationInit() {
 		}),
 	}
 
-	dbpool, err := pgxpool.New(ctx, Inst.Config.DBString)
-	if err != nil {
-		panic(err)
-	}
-
-	if err = dbpool.Ping(ctx); err != nil {
-		panic(err)
-	}
-
-	Inst.DB = dbpool
+	Inst.DB = dbConnect(ctx, Inst.Config.DBString)
 }
 
 func Setup() {
@@ -68,6 +59,19 @@ func Setup() {
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
+}
+
+func dbConnect(ctx context.Context, dbString string) *pgxpool.Pool {
+	dbpool, err := pgxpool.New(ctx, dbString)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = dbpool.Ping(ctx); err != nil {
+		panic(err)
+	}
+
+	return dbpool
 }
 
 func customErrorHandler(context *fiber.Ctx, err error) error {

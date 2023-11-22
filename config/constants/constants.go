@@ -38,6 +38,7 @@ var (
 	Environment      = os.Getenv("ENVIRONMENT")
 	Prefork          = strings.ToLower(os.Getenv("PREFORK")) != "false"
 	UseSecretManager = strings.ToLower(os.Getenv("USE_SECRETMANAGER")) != "false"
+	UseIAM           = strings.ToLower(os.Getenv("USE_IAM")) == "" || strings.ToLower(os.Getenv("USE_IAM")) == "true"
 )
 
 var (
