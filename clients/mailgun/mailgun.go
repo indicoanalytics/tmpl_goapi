@@ -9,9 +9,9 @@ import (
 	"net/http"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
-	"api.default.indicoinnovation.pt/pkg/app"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	requestsnippet "github.com/indicoinnovation/go-request-snippet"
 )
@@ -28,8 +28,8 @@ type mailgunResponse struct {
 
 func New() *Mailgun {
 	return &Mailgun{
-		APIHost: fmt.Sprintf("https://api.mailgun.net/v3/%s/messages", app.Inst.Config.MailGunDomain),
-		APIKey:  fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("api:"+app.Inst.Config.MailGunKey))),
+		APIHost: fmt.Sprintf("https://api.mailgun.net/v3/%s/messages", appinstance.Data.Config.MailGunDomain),
+		APIKey:  fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte("api:"+appinstance.Data.Config.MailGunKey))),
 	}
 }
 
@@ -74,7 +74,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	}
 
 	emailData := map[string]string{
-		"from":    fmt.Sprintf("%s <%s>", app.Inst.Config.EmailSenderLabel, app.Inst.Config.EmailSenderAddress),
+		"from":    fmt.Sprintf("%s <%s>", appinstance.Data.Config.EmailSenderLabel, appinstance.Data.Config.EmailSenderAddress),
 		"to":      to,
 		"subject": messageAttr.Subject,
 		"html":    content,

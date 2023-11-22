@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/handler/health"
 	"api.default.indicoinnovation.pt/middleware"
-	"api.default.indicoinnovation.pt/pkg/app"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -26,21 +26,21 @@ func route() *fiber.App {
 		allowedOrigins += fmt.Sprintf(", %s", constants.AllowedStageOrigins)
 	}
 
-	app.Inst.Server.Use(logger.New())
-	app.Inst.Server.Use(recover.New())
-	app.Inst.Server.Use(favicon.New())
-	app.Inst.Server.Use(cors.New(cors.Config{
+	appinstance.Data.Server.Use(logger.New())
+	appinstance.Data.Server.Use(recover.New())
+	appinstance.Data.Server.Use(favicon.New())
+	appinstance.Data.Server.Use(cors.New(cors.Config{
 		AllowMethods: constants.AllowedMethods,
 		AllowOrigins: allowedOrigins,
 		AllowHeaders: constants.AllowedHeaders,
 	}))
-	app.Inst.Server.Use(middleware.ValidateContentType())
-	app.Inst.Server.Use(middleware.SecurityHeaders())
-	app.Inst.Server.Use(compress.New(compress.Config{
+	appinstance.Data.Server.Use(middleware.ValidateContentType())
+	appinstance.Data.Server.Use(middleware.SecurityHeaders())
+	appinstance.Data.Server.Use(compress.New(compress.Config{
 		Level: compress.LevelBestCompression,
 	}))
 
-	apiGroup := app.Inst.Server.Group("/api")
+	apiGroup := appinstance.Data.Server.Group("/api")
 	apiGroup.Use(limiter.New(limiter.Config{
 		Next: func(c *fiber.Ctx) bool {
 			return helpers.Contains(constants.AllowedUnthrottledIPs, c.IP())
@@ -66,5 +66,5 @@ func route() *fiber.App {
 
 	// Put auth required routes here
 
-	return app.Inst.Server
+	return appinstance.Data.Server
 }

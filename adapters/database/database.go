@@ -3,11 +3,13 @@ package database
 import (
 	"context"
 	"errors"
+	"log"
 	"reflect"
 
-	"api.default.indicoinnovation.pt/pkg/app"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type (
@@ -17,6 +19,21 @@ type (
 
 func New[T Output]() *Database[T] {
 	return &Database[T]{}
+}
+
+func Connect(ctx context.Context) *pgxpool.Pool {
+	dbpool, err := pgxpool.New(ctx, appinstance.Data.Config.DBString)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = dbpool.Ping(ctx); err != nil {
+		panic(err)
+	}
+
+	log.Println("database connected successfully")
+
+	return dbpool
 }
 
 func Query[T Output](query string, outputType T, args ...interface{}) (T, error) { //nolint: ireturn
@@ -39,19 +56,19 @@ func QueryCount(query string, args ...interface{}) (int, error) {
 }
 
 func (db *Database[T]) Query(query string, outputType T, args ...interface{}) (T, error) { //nolint: ireturn
-	err := pgxscan.Select(context.Background(), app.Inst.DB, outputType, query, args...)
+	err := pgxscan.Select(context.Background(), appinstance.Data.DB, outputType, query, args...)
 
 	return outputType, err
 }
 
 func (db *Database[T]) Exec(query string, args ...interface{}) error {
-	_, err := app.Inst.DB.Exec(context.Background(), query, args...)
+	_, err := appinstance.Data.DB.Exec(context.Background(), query, args...)
 
 	return err
 }
 
 func (db *Database[T]) QueryOne(query string, outputType T, args ...interface{}) (T, error) { //nolint: ireturn
-	err := pgxscan.Get(context.Background(), app.Inst.DB, outputType, query, args...)
+	err := pgxscan.Get(context.Background(), appinstance.Data.DB, outputType, query, args...)
 	if errors.Is(err, pgx.ErrNoRows) {
 		err = nil
 	}
@@ -66,7 +83,7 @@ func (db *Database[T]) QueryCount(query string, args ...interface{}) (int, error
 
 	rows := &Count{}
 
-	err := pgxscan.Get(context.Background(), app.Inst.DB, rows, query, args...)
+	err := pgxscan.Get(context.Background(), appinstance.Data.DB, rows, query, args...)
 	if errors.Is(err, pgx.ErrNoRows) {
 		err = nil
 	}

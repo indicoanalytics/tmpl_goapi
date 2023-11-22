@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
-	"api.default.indicoinnovation.pt/pkg/app"
 	"cloud.google.com/go/storage"
 )
 
@@ -32,14 +32,14 @@ func SignedURL(object string, srcFolder string) (string, error) {
 	_, client := New()
 	defer client.Close()
 
-	finalObject := fmt.Sprintf("%s/%s/%s", app.Inst.Config.StorageBaseFolder, srcFolder, object)
+	finalObject := fmt.Sprintf("%s/%s/%s", appinstance.Data.Config.StorageBaseFolder, srcFolder, object)
 
 	opts := &storage.SignedURLOptions{
 		Method:  "GET",
 		Expires: time.Now().UTC().Add(constants.SignedURLExp * time.Minute),
 	}
 
-	url, err := client.Bucket(app.Inst.Config.StorageBucket).SignedURL(finalObject, opts)
+	url, err := client.Bucket(appinstance.Data.Config.StorageBucket).SignedURL(finalObject, opts)
 	if err != nil {
 		go logging.Log(&entity.LogDetails{
 			Message: "error to retrieve google storage signed url",
@@ -59,8 +59,8 @@ func SignedURL(object string, srcFolder string) (string, error) {
 func Upload(object string, dstFolder string, reader io.Reader, public bool) error {
 	ctx, client := New()
 
-	bucket := client.Bucket(app.Inst.Config.StorageBucket)
-	blob := bucket.Object(fmt.Sprintf("%s/%s/%s", app.Inst.Config.StorageBaseFolder, dstFolder, object))
+	bucket := client.Bucket(appinstance.Data.Config.StorageBucket)
+	blob := bucket.Object(fmt.Sprintf("%s/%s/%s", appinstance.Data.Config.StorageBaseFolder, dstFolder, object))
 	writer := blob.NewWriter(ctx)
 
 	if _, err := io.Copy(writer, reader); err != nil {
