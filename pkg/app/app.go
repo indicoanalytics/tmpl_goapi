@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 
+	"api.default.indicoinnovation.pt/adapters/database"
 	"api.default.indicoinnovation.pt/adapters/logging"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/clients/iam"
 	"api.default.indicoinnovation.pt/config"
 	"api.default.indicoinnovation.pt/config/constants"
@@ -15,16 +17,7 @@ import (
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	json "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-type Application struct {
-	Config *config.Config
-	DB     *pgxpool.Pool
-	Server *fiber.App
-}
-
-var Inst *Application
 
 func ApplicationInit() {
 	configs := config.New()
@@ -34,7 +27,7 @@ func ApplicationInit() {
 		iam.New()
 	}
 
-	Inst = &Application{
+	appinstance.Data = &appinstance.Application{
 		Config: configs,
 		Server: fiber.New(fiber.Config{
 			ServerHeader: "Death Star",
@@ -45,33 +38,20 @@ func ApplicationInit() {
 		}),
 	}
 
-	Inst.DB = dbConnect(ctx, Inst.Config.DBString)
+	appinstance.Data.DB = database.Connect(ctx)
 }
 
 func Setup() {
 	var err error
 	if constants.UseTLS {
-		err = Inst.Server.ListenTLS(fmt.Sprintf(":%s", constants.Port), "cert.pem", "key.pem")
+		err = appinstance.Data.Server.ListenTLS(fmt.Sprintf(":%s", constants.Port), "cert.pem", "key.pem")
 	} else {
-		err = Inst.Server.Listen(fmt.Sprintf(":%s", constants.Port))
+		err = appinstance.Data.Server.Listen(fmt.Sprintf(":%s", constants.Port))
 	}
 
 	if errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
-}
-
-func dbConnect(ctx context.Context, dbString string) *pgxpool.Pool {
-	dbpool, err := pgxpool.New(ctx, dbString)
-	if err != nil {
-		panic(err)
-	}
-
-	if err = dbpool.Ping(ctx); err != nil {
-		panic(err)
-	}
-
-	return dbpool
 }
 
 func customErrorHandler(context *fiber.Ctx, err error) error {

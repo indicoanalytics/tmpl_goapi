@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/entity"
-	"api.default.indicoinnovation.pt/pkg/app"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	"cloud.google.com/go/pubsub"
 )
@@ -13,7 +13,7 @@ import (
 func New() (context.Context, *pubsub.Client) {
 	ctx := context.Background()
 
-	client, err := pubsub.NewClient(ctx, app.Inst.Config.GcpProjectID)
+	client, err := pubsub.NewClient(ctx, appinstance.Data.Config.GcpProjectID)
 	if err != nil {
 		logging.Log(&entity.LogDetails{
 			Message: "error to create new pubsub client",
