@@ -7,6 +7,11 @@ include .env
 export
 endif
 
+ifneq (,$(wildcard ./.env.test))
+include .env.test
+export
+endif
+
 # Setup application
 setup: go.mod
 	@echo "`tput bold`#### Verifying configuration files and server certificates ####`tput sgr0`"
@@ -69,12 +74,11 @@ lint:
 	golangci-lint run $(file) --go=1.20 --enable-all --disable tagliatelle,wsl,godox,lll,gochecknoglobals,exhaustruct,exhaustivestruct,wrapcheck,depguard
   endif
 
-TEST_DATABASE=test_db
 # Test application
-test:
-	. .venv/bin/activate; migrate execute --driver pgsql
+test: .env.test
+	. .venv/bin/activate; DATABASE_MIGRATION_URL=$(TEST_DATABASE_MIGRATION_URL) migrate execute --driver pgsql
 	go clean -testcache;
-	go test -tags=unit -short -timeout 30s -v ./...
+	ENVIRONMENT=test INNOVATION_CREDENTIALS=$(CURDIR)/innovation.json go test -tags=unit -short -timeout 30s -v $(file)
 
 # format go files to avoid gofumpt linting errors
 format:
