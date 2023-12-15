@@ -10,6 +10,7 @@ import (
 	"api.default.indicoinnovation.pt/entity"
 	"api.default.indicoinnovation.pt/handler/health"
 	"api.default.indicoinnovation.pt/middleware"
+	"api.default.indicoinnovation.pt/pkg/app"
 	"api.default.indicoinnovation.pt/pkg/helpers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -59,7 +60,7 @@ func route() *fiber.App {
 		},
 	}))
 
-	apiGroup.Get("/health", health.Handle().Check)
+	apiGroup.Get("/health", health.Handle().Check, app.Log)
 
 	// secureRoutes := apiGroup.Group("", middleware.Authorize())
 	// v1Group := secureRoutes.Group("/v1")
