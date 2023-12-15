@@ -8,7 +8,7 @@ import (
 	gcpLogging "github.com/indicoinnovation/gcp_logging_easycall"
 )
 
-func Log(_ context.Context, message *entity.LogDetails, severity constants.LoggingSeverity, resourceLabels *map[string]string) {
+func Log(_ context.Context, message *entity.LogDetails, severity string, resourceLabels *map[string]string) {
 	labels := map[string]string{"service": constants.MainServiceName}
 	if resourceLabels != nil {
 		for k, v := range *resourceLabels {
@@ -20,7 +20,7 @@ func Log(_ context.Context, message *entity.LogDetails, severity constants.Loggi
 		constants.GcpProjectID,
 		constants.MainLoggerName,
 		message,
-		string(severity),
+		severity,
 		"api",
 		labels,
 	)

@@ -9,7 +9,7 @@ import (
 	"api.default.indicoinnovation.pt/entity"
 )
 
-func Log(details *entity.LogDetails, severity constants.LoggingSeverity, resourceLabels *map[string]string) {
+func Log(details *entity.LogDetails, severity string, resourceLabels *map[string]string) {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(constants.DefaultContextTimeout))
 	defer cancel()
 

@@ -90,3 +90,35 @@ func customErrorHandler(context *fiber.Ctx, err error) error {
 
 	return helpers.CreateResponse(context, errorResponse, code) //nolint: wrapcheck
 }
+
+func Log(ctx *fiber.Ctx) error {
+	logMessage := ctx.Locals("log_message")
+	errorReason := ctx.Locals("error_reason")
+	response := ctx.Locals("response")
+	logSeverity := ctx.Locals("log_severity")
+	statusCode := ctx.Locals("status_code")
+
+	if statusCode == nil {
+		statusCode = constants.HTTPStatusOK
+	}
+
+	if logSeverity == nil {
+		logSeverity = "info"
+	}
+
+	severity, _ := logSeverity.(string)
+	reason, _ := errorReason.(string)
+	message, _ := logMessage.(string)
+	status, _ := statusCode.(int)
+
+	logging.Log(&entity.LogDetails{
+		Message:    message,
+		StatusCode: status,
+		Reason:     reason,
+		Response:   response,
+		Request:    string(ctx.BodyRaw()),
+		Method:     ctx.Method(),
+	}, severity, nil)
+
+	return nil
+}
