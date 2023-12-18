@@ -1,44 +1,34 @@
 package middleware
 
-import (
-	"net/http"
-	"strings"
+// func Authorize() func(context *fiber.Ctx) error {
+// 	return func(context *fiber.Ctx) error {
+// 		// TODO: Implement mechanism to authorize requests from given IP to measure endpoint status and metrics
+// 		// TODO: Log intent to Authorize request
 
-	"api.default.indicoinnovation.pt/adapters/jwt"
-	"api.default.indicoinnovation.pt/entity"
-	"api.default.indicoinnovation.pt/pkg/helpers"
-	"github.com/gofiber/fiber/v2"
-)
+// 		authBearer := context.GetReqHeaders()["Authorization"]
+// 		authSpec := strings.Split(authBearer, " ")
 
-func Authorize() func(context *fiber.Ctx) error {
-	return func(context *fiber.Ctx) error {
-		// TODO: Implement mechanism to authorize requests from given IP to measure endpoint status and metrics
-		// TODO: Log intent to Authorize request
+// 		if authSpec[0] != "Bearer" {
+// 			return helpers.CreateResponse(context, &entity.ErrorResponse{
+// 				Message:    "Unauthorized",
+// 				StatusCode: http.StatusUnauthorized,
+// 			}, http.StatusUnauthorized)
+// 		}
 
-		authBearer := context.GetReqHeaders()["Authorization"]
-		authSpec := strings.Split(authBearer, " ")
+// 		if authSpec[1] == "" {
+// 			return helpers.CreateResponse(context, &entity.ErrorResponse{
+// 				Message:    "Unauthorized",
+// 				StatusCode: http.StatusUnauthorized,
+// 			}, http.StatusUnauthorized)
+// 		}
 
-		if authSpec[0] != "Bearer" {
-			return helpers.CreateResponse(context, &entity.ErrorResponse{
-				Message:    "Unauthorized",
-				StatusCode: http.StatusUnauthorized,
-			}, http.StatusUnauthorized)
-		}
+// 		if !jwt.New().Validate(authSpec[1]) {
+// 			return helpers.CreateResponse(context, &entity.ErrorResponse{
+// 				Message:    "Unauthorized",
+// 				StatusCode: http.StatusUnauthorized,
+// 			}, http.StatusUnauthorized)
+// 		}
 
-		if authSpec[1] == "" {
-			return helpers.CreateResponse(context, &entity.ErrorResponse{
-				Message:    "Unauthorized",
-				StatusCode: http.StatusUnauthorized,
-			}, http.StatusUnauthorized)
-		}
-
-		if !jwt.New().Validate(authSpec[1]) {
-			return helpers.CreateResponse(context, &entity.ErrorResponse{
-				Message:    "Unauthorized",
-				StatusCode: http.StatusUnauthorized,
-			}, http.StatusUnauthorized)
-		}
-
-		return context.Next()
-	}
-}
+// 		return context.Next()
+// 	}
+// }

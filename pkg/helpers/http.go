@@ -24,11 +24,11 @@ func FromHTTPRequest(_ *fiber.Ctx) *Request {
 	return &Request{}
 }
 
-func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) error {
+func CreateResponse(context *fiber.Ctx, payload interface{}, status ...int) {
 	returnStatus := http.StatusOK
 	if len(status) > 0 {
 		returnStatus = status[0]
 	}
 
-	return context.Status(returnStatus).JSON(payload)
+	context.Status(returnStatus).JSON(payload) //nolint: errcheck
 }

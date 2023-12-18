@@ -40,6 +40,7 @@ func Query[T Output](query string, outputType T, args ...interface{}) (T, error)
 	if reflect.TypeOf(outputType).Elem().Kind() == reflect.Slice {
 		return New[T]().Query(query, outputType, args...)
 	}
+
 	return New[T]().QueryOne(query, outputType, args...)
 }
 
