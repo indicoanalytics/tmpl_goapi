@@ -20,25 +20,29 @@ func Handle() *Handler {
 
 func (handler *Handler) Check(ctx *fiber.Ctx) error {
 	check, err := handler.usecase.Check()
-
 	if err != nil {
-		ctx.Locals("log_message", "error to check health")
-		ctx.Locals("error_reason", err.Error())
+		ctx.Locals(constants.LogDataKey, &entity.LogDetails{
+			Message:    "error to check health",
+			Reason:     err.Error(),
+			StatusCode: constants.HTTPStatusInternalServerError,
+		})
 		ctx.Locals("log_severity", constants.SeverityError)
-		ctx.Locals("status_code", constants.HTTPStatusInternalServerError)
-		ctx.Locals("response", &entity.ErrorResponse{
+
+		helpers.CreateResponse(ctx, &entity.ErrorResponse{
 			Message:     "error to check health",
 			Description: err.Error(),
 			StatusCode:  constants.HTTPStatusInternalServerError,
-		})
-
-		helpers.CreateResponse(ctx, ctx.Locals("response"), constants.HTTPStatusInternalServerError)
+		}, constants.HTTPStatusInternalServerError)
 
 		return ctx.Next()
 	}
 
-	ctx.Locals("log_message", "successfully health checked")
-	ctx.Locals("response", check)
+	ctx.Locals(constants.LogDataKey, &entity.LogDetails{
+		Message:    "successfully health checked",
+		StatusCode: constants.HTTPStatusOK,
+		Response:   check,
+	})
+	ctx.Locals("log_severity", constants.SeverityInfo)
 
 	helpers.CreateResponse(ctx, check, constants.HTTPStatusOK)
 

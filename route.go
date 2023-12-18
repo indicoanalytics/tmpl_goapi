@@ -52,11 +52,13 @@ func route() *fiber.App {
 			return c.Get("x-forwarded-for")
 		},
 		LimitReached: func(c *fiber.Ctx) error {
-			return helpers.CreateResponse(c, &entity.ErrorResponse{
+			helpers.CreateResponse(c, &entity.ErrorResponse{
 				Message:     "Calls Limit Reached",
 				Description: "Rate Limit reached",
 				StatusCode:  http.StatusTooManyRequests,
 			}, http.StatusTooManyRequests)
+
+			return nil
 		},
 	}))
 
