@@ -101,7 +101,7 @@ func customErrorHandler(ctx *fiber.Ctx, err error) error {
 }
 
 func Log(ctx *fiber.Ctx) error {
-	logSeverity := ctx.Locals("log_severity")
+	logSeverity := ctx.Locals(constants.LogSeverityKey)
 
 	payload := new(entity.LogDetails)
 	bytedata, _ := helpers.Marshal(ctx.Locals(constants.LogDataKey))
