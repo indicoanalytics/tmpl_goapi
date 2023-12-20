@@ -12,6 +12,7 @@ import (
 const (
 	Port                      = "9090"
 	LogDataKey                = "payload"
+	LogSeverityKey            = "log_severity"
 	MainLoggerName            = "health"
 	MainServiceName           = MainLoggerName + "_api"
 	MaxResquestLimit          = 2

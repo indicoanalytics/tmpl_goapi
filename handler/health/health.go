@@ -26,7 +26,7 @@ func (handler *Handler) Check(ctx *fiber.Ctx) error {
 			Reason:     err.Error(),
 			StatusCode: constants.HTTPStatusInternalServerError,
 		})
-		ctx.Locals("log_severity", constants.SeverityError)
+		ctx.Locals(constants.LogSeverityKey, constants.SeverityError)
 
 		helpers.CreateResponse(ctx, &entity.ErrorResponse{
 			Message:     "error to check health",
@@ -42,7 +42,7 @@ func (handler *Handler) Check(ctx *fiber.Ctx) error {
 		StatusCode: constants.HTTPStatusOK,
 		Response:   check,
 	})
-	ctx.Locals("log_severity", constants.SeverityInfo)
+	ctx.Locals(constants.LogSeverityKey, constants.SeverityInfo)
 
 	helpers.CreateResponse(ctx, check, constants.HTTPStatusOK)
 
