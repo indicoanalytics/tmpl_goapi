@@ -86,7 +86,7 @@ func customErrorHandler(ctx *fiber.Ctx, err error) error {
 			Request: map[string]interface{}{
 				"body":       string(ctx.BodyRaw()),
 				"query":      ctx.Queries(),
-				"url_params": ctx.Locals("url_params"),
+				"url_params": ctx.AllParams(),
 			},
 			StatusCode: code,
 			URLpath:    ctx.Path(),
@@ -117,10 +117,10 @@ func Log(ctx *fiber.Ctx) error {
 	request := map[string]interface{}{
 		"body":       body,
 		"query":      ctx.Queries(),
-		"url_params": ctx.Locals("url_params"),
+		"url_params": ctx.AllParams(),
 	}
 
-	severity, _ := logSeverity.(string)
+	severity := fmt.Sprintf("%v", logSeverity)
 
 	logging.Log(&entity.LogDetails{
 		Message:    payload.Message,

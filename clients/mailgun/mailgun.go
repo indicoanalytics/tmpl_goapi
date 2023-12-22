@@ -106,7 +106,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 		logging.Log(&entity.LogDetails{
 			Message:  "error to send email through mailgun",
 			Reason:   err.Error(),
-			Request:  fmt.Sprintf("%+v", request),
+			Request:  request,
 			Response: response,
 		}, "critical", nil)
 
@@ -116,7 +116,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 	if !helpers.Contains(constants.HTTPStatusesOk, fmt.Sprintf("%d", response.StatusCode)) {
 		logging.Log(&entity.LogDetails{
 			Message:    "status code error while sending email through mailgun",
-			Request:    fmt.Sprintf("%+v", request),
+			Request:    request,
 			Response:   string(response.Message),
 			StatusCode: response.StatusCode,
 		}, "critical", nil)
@@ -130,7 +130,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 		logging.Log(&entity.LogDetails{
 			Message:  "error to unmarshal mailgun response",
 			Reason:   err.Error(),
-			Request:  fmt.Sprintf("%+v", request),
+			Request:  request,
 			Response: string(response.Message),
 		}, "critical", nil)
 
@@ -139,7 +139,7 @@ func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) {
 
 	logging.Log(&entity.LogDetails{
 		Message:  "email successfully sent through mailgun",
-		Request:  fmt.Sprintf("%+v", request),
+		Request:  request,
 		Response: responseMessage,
 	}, "info", nil)
 }
