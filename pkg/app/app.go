@@ -1,16 +1,15 @@
 package app
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
-	"api.default.indicoinnovation.pt/adapters/database"
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/clients/iam"
+	"api.default.indicoinnovation.pt/clients/postgres"
 	"api.default.indicoinnovation.pt/config"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
@@ -21,7 +20,6 @@ import (
 
 func ApplicationInit() {
 	configs := config.New()
-	ctx := context.Background()
 
 	if constants.Environment != constants.Test {
 		iam.New()
@@ -38,7 +36,7 @@ func ApplicationInit() {
 		}),
 	}
 
-	appinstance.Data.DB = database.Connect(ctx)
+	appinstance.Data.DB = postgres.Connect(appinstance.Data.Config.DBString)
 }
 
 func Setup() {
