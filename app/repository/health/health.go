@@ -4,19 +4,26 @@ import (
 	"time"
 
 	"api.default.indicoinnovation.pt/adapters/database"
+	"api.default.indicoinnovation.pt/app/appinstance"
 	"api.default.indicoinnovation.pt/entity"
 )
 
-type Repository struct{}
+type Repository struct {
+	database *database.Database[entity.Health]
+}
 
 func New() *Repository {
-	return &Repository{}
+	return &Repository{
+		database: database.New[entity.Health](appinstance.Data.DB),
+	}
 }
 
 func (repo *Repository) Insert(now time.Time) error {
-	return database.Exec("INSERT INTO health (sync) VALUES ($1)", now)
+	_, err := repo.database.Exec("INSERT INTO health (sync) VALUES ($1)", now)
+
+	return err
 }
 
 func (repo *Repository) GetOne(now time.Time) (*entity.Health, error) {
-	return database.New[*entity.Health]().QueryOne("SELECT * FROM health WHERE sync = $1", new(entity.Health), now)
+	return repo.database.QueryOne("SELECT sync FROM health WHERE sync = $1", now)
 }
