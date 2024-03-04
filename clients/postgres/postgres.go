@@ -26,7 +26,7 @@ func Connect(dbString string) *sql.DB {
 		panic(err)
 	}
 
-	log.Println("database connected successfully")
+	log.Println("postgres database connected successfully")
 
 	return pool
 }

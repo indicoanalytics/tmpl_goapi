@@ -27,7 +27,7 @@ func Connect(dbString string) *sql.DB {
 		panic(err)
 	}
 
-	log.Println("database connected successfully")
+	log.Println("mysql database connected successfully")
 
 	return pool
 }
