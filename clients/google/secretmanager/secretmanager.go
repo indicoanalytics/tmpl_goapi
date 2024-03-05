@@ -70,10 +70,8 @@ func (secretmanager *GCPSecretManager) ListSecrets(parent string, filterPrefix s
 		splitSecret := strings.Split(secret.Name, "/")
 		secretName := splitSecret[len(splitSecret)-1]
 
-		if filterPrefix != "" {
-			if strings.Contains(secretName, filterPrefix) {
-				secretName = strings.Split(secretName, filterPrefix)[1]
-			}
+		if filterPrefix != "" && strings.HasPrefix(secretName, filterPrefix) {
+			secretName = strings.TrimPrefix(secretName, filterPrefix)
 		}
 
 		secretList[secretName] = secretmanager.accessSecretVersion(fmt.Sprintf("%s/versions/latest", secret.Name))
