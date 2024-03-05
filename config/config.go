@@ -1,12 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	secretClient "api.default.indicoinnovation.pt/clients/google/secretmanager"
@@ -19,7 +17,7 @@ import (
 type Config struct {
 	Port               string `json:"port"`
 	DBString           string `json:"database_url"`
-	DBLogMode          int    `json:"db_log_mode"`
+	DBLogMode          int    `json:"db_log_mode,string"`
 	GcpProjectID       string `json:"project_id"`
 	StorageBucket      string `json:"storage_bucket"`
 	StorageBaseFolder  string `json:"storage_base_folder"`
@@ -70,16 +68,6 @@ func setupSecretManager() *Config {
 	)
 
 	secretList := secretClient.New().ListSecrets(constants.GcpProjectID, constants.SecretPrefix)
-	secretList["db_log_mode"], err = strconv.Atoi(fmt.Sprintf("%s", secretList["db_log_mode"]))
-	if err != nil {
-		logging.Log(&entity.LogDetails{
-			Message:  "error to parse secrets",
-			Reason:   err.Error(),
-			Response: secretList,
-		}, "critical", nil)
-
-		panic(err)
-	}
 
 	secretBytes, err := helpers.MapToBytes(secretList)
 	if err != nil {
