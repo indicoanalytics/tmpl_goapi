@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/georgysavva/scany/v2/sqlscan"
 )
@@ -25,9 +24,6 @@ func (db *Database[T]) Exec(query string, args ...interface{}) (sql.Result, erro
 func (db *Database[T]) QueryAll(query string, args ...interface{}) ([]*T, error) {
 	output := new([]*T)
 	err := sqlscan.Select(context.Background(), db.pool, output, query, args...)
-	if errors.Is(err, sql.ErrNoRows) {
-		err = nil
-	}
 
 	return *output, err
 }
@@ -35,9 +31,6 @@ func (db *Database[T]) QueryAll(query string, args ...interface{}) ([]*T, error)
 func (db *Database[T]) QueryOne(query string, args ...interface{}) (*T, error) {
 	output := new(T)
 	err := sqlscan.Get(context.Background(), db.pool, output, query, args...)
-	if errors.Is(err, sql.ErrNoRows) {
-		err = nil
-	}
 
 	return output, err
 }
@@ -47,9 +40,6 @@ func (db *Database[T]) QueryCount(query string, args ...interface{}) (int, error
 
 	var count int
 	err := row.Scan(&count)
-	if errors.Is(err, sql.ErrNoRows) {
-		err = nil
-	}
 
 	return count, err
 }
