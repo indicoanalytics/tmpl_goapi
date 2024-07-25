@@ -11,7 +11,7 @@ import (
 
 func ValidateContentType() func(context *fiber.Ctx) error {
 	return func(context *fiber.Ctx) error {
-		if context.GetReqHeaders()["Accept"] == "" || !helpers.Contains(constants.AllowedContentTypes, context.GetReqHeaders()["Accept"]) {
+		if len(context.GetReqHeaders()["Accept"]) > 0 && context.GetReqHeaders()["Accept"][0] == "" || !helpers.Contains(constants.AllowedContentTypes, context.GetReqHeaders()["Accept"][0]) {
 			helpers.CreateResponse(context, &entity.ErrorResponse{
 				Message:    "Content Not Accepted",
 				StatusCode: http.StatusNotAcceptable,
