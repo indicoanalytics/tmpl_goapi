@@ -125,7 +125,7 @@ func (secretmanager *GCPSecretManager) getSecretLastAvailableVersion(secretName 
 			panic(err)
 		}
 
-		if version.State != secretmanagerpb.SecretVersion_ENABLED {
+		if version.State != secretmanagerpb.SecretVersion_ENABLED { //nolint:nosnakecase
 			continue
 		}
 

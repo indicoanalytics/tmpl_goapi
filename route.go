@@ -41,8 +41,8 @@ func route() *fiber.App {
 		Level: compress.LevelBestCompression,
 	}))
 
-	apiGroup := appinstance.Data.Server.Group("/api")
-	apiGroup.Use(limiter.New(limiter.Config{
+	root := appinstance.Data.Server.Group("/")
+	root.Use(limiter.New(limiter.Config{
 		Next: func(c *fiber.Ctx) bool {
 			return helpers.Contains(constants.AllowedUnthrottledIPs, c.IP())
 		},
@@ -62,12 +62,10 @@ func route() *fiber.App {
 		},
 	}))
 
-	apiGroup.Get("/health", health.Handle().Check, app.Log)
+	root.Get("/health", health.Handle().Check, app.Log)
 
-	// secureRoutes := apiGroup.Group("", middleware.Authorize())
-	// v1Group := secureRoutes.Group("/v1")
-
-	// Put auth required routes here
+	apiGroup := root.Group("/api")
+	apiRoutesV1(apiGroup)
 
 	return appinstance.Data.Server
 }

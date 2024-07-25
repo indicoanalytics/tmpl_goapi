@@ -67,7 +67,7 @@ func parseTemplate(templateName string, args ...map[string]interface{}) (string,
 	return content.String(), nil
 }
 
-func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) { //nolint:varnamelen
+func (mailgun *Mailgun) Send(to string, messageAttr *entity.MessageAttributes) { //nolint:varnamelen,funlen
 	content, err := parseTemplate(messageAttr.Template, messageAttr.Args)
 	if err != nil {
 		return
