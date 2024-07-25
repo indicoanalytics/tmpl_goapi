@@ -1,9 +1,11 @@
 package health
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 
+	"api.default.indicoinnovation.pt/app/errs"
 	"api.default.indicoinnovation.pt/app/repository/health"
 	"api.default.indicoinnovation.pt/entity"
 )
@@ -29,11 +31,15 @@ func (usecase *Usecase) Check() (*entity.Health, error) {
 
 	check, err := usecase.repo.GetOne(now)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, &errs.RequestError{Err: errs.ErrHealthNotFound}
+		}
+
 		return nil, err
 	}
 
 	if check.Sync == nil || check.Sync.IsZero() {
-		return nil, errOutOfSync
+		return nil, &errs.RequestError{Err: errOutOfSync}
 	}
 
 	return check, nil

@@ -1,4 +1,4 @@
-package constants
+package errs
 
 import "errors"
 
@@ -8,3 +8,5 @@ var (
 	ErrDatabaseNotConnected = errors.New("database is not connected")
 	ErrAssertDBResponse     = errors.New("error while asserting database response")
 )
+
+var ErrHealthNotFound = errors.New("health was not found")
