@@ -1,6 +1,9 @@
 package health
 
 import (
+	"errors"
+
+	"api.default.indicoinnovation.pt/app/errs"
 	"api.default.indicoinnovation.pt/app/usecases/health"
 	"api.default.indicoinnovation.pt/config/constants"
 	"api.default.indicoinnovation.pt/entity"
@@ -28,9 +31,18 @@ func (handler *Handler) Check(ctx *fiber.Ctx) error {
 		})
 		ctx.Locals(constants.LogSeverityKey, constants.SeverityError)
 
+		var (
+			description  string
+			requestError *errs.RequestError
+		)
+
+		if errors.As(err, &requestError) {
+			description = requestError.Unwrap().Error()
+		}
+
 		helpers.CreateResponse(ctx, &entity.ErrorResponse{
 			Message:     "error to check health",
-			Description: err.Error(),
+			Description: description,
 			StatusCode:  constants.HTTPStatusInternalServerError,
 		}, constants.HTTPStatusInternalServerError)
 
