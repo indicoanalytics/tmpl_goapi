@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"api.default.indicoinnovation.pt/adapters/logging"
 	"api.default.indicoinnovation.pt/app/appinstance"
@@ -41,10 +42,16 @@ func ApplicationInit() {
 
 func Setup() {
 	var err error
+
+	port := constants.Port
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+
 	if constants.UseTLS {
-		err = appinstance.Data.Server.ListenTLS(fmt.Sprintf(":%s", constants.Port), "cert.pem", "key.pem")
+		err = appinstance.Data.Server.ListenTLS(fmt.Sprintf(":%s", port), "cert.pem", "key.pem")
 	} else {
-		err = appinstance.Data.Server.Listen(fmt.Sprintf(":%s", constants.Port))
+		err = appinstance.Data.Server.Listen(fmt.Sprintf(":%s", port))
 	}
 
 	if errors.Is(err, http.ErrServerClosed) {
